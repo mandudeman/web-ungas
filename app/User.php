@@ -40,11 +40,11 @@ class User extends Authenticatable
 
     public function profile()
     {
-        return $this->hasOne('App\Profile');
+        return $this->hasOne(\App\Profile::class);
     }
 
     public function role()
     {
-        return $this->hasOne('App\RoleManage', 'id');
+        return $this->hasOne(\App\RoleManage::class, 'id');
     }
 }

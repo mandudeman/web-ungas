@@ -35,17 +35,17 @@ class Transaction extends Model
 
     public function Branch()
     {
-        return $this->belongsTo('App\Branch', 'branch_id');
+        return $this->belongsTo(\App\Branch::class, 'branch_id');
     }
 
     public function IncomeExpenseHead()
     {
-        return $this->belongsTo('App\IncomeExpenseHead', 'income_expense_head_id');
+        return $this->belongsTo(\App\IncomeExpenseHead::class, 'income_expense_head_id');
     }
 
     public function BankCash()
     {
-        return $this->belongsTo('App\BankCash', 'bank_cash_id');
+        return $this->belongsTo(\App\BankCash::class, 'bank_cash_id');
     }
 
     public function isDebitByIncomeExpenseHeadID($id)
