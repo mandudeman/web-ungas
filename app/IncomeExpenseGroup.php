@@ -22,7 +22,6 @@ class IncomeExpenseGroup extends Model
 
     ];
 
-    protected $dates = ['deleted_at'];
 
     public function IncomeExpenseHeads()
     {
