@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware\Roles\IncomeExpenseType;
 
-use Closure;
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
+
 class all
 {
     /**
@@ -16,10 +17,11 @@ class all
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.LedgerType.All')){
+        if (config('role_manage.LedgerType.All')) {
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->route('dashboard');
         }
     }

@@ -90,7 +90,6 @@ class Kernel extends HttpKernel
         'settings.all' => \App\Http\Middleware\Roles\Settings\All::class,
         'settings.show' => \App\Http\Middleware\Roles\Settings\Show::class,
 
-
         'branch.module_show' => \App\Http\Middleware\Roles\Branch\ModuleShow::class,
         'branch.show' => \App\Http\Middleware\Roles\Branch\Show::class,
         'branch.create' => \App\Http\Middleware\Roles\Branch\Create::class,
@@ -120,9 +119,6 @@ class Kernel extends HttpKernel
         'income_expense_group.restore' => \App\Http\Middleware\Roles\IncomeExpenseGroup\Restore::class,
         'income_expense_group.trash_show' => \App\Http\Middleware\Roles\IncomeExpenseGroup\TrashShow::class,
         'income_expense_group.permanently_delete' => \App\Http\Middleware\Roles\IncomeExpenseGroup\PermanentlyDelete::class,
-
-
-
 
         'income_expense_head.all' => \App\Http\Middleware\Roles\IncomeExpenseHead\All::class,
         'income_expense_head.show' => \App\Http\Middleware\Roles\IncomeExpenseHead\Show::class,
@@ -224,9 +220,6 @@ class Kernel extends HttpKernel
 
         'report.Notes.all' => \App\Http\Middleware\Roles\Report\Notes\All::class,
 
-
-
-
         'report.general_report.branch.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Branch\All::class,
 
         'report.general_report.ledger.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Ledger\All::class,
@@ -234,10 +227,6 @@ class Kernel extends HttpKernel
         'report.general_report.BankCash.all' => \App\Http\Middleware\Roles\Report\GeneralReport\BankCash\All::class,
 
         'report.general_report.Voucher.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Voucher\All::class,
-
-
-
-
 
     ];
 }

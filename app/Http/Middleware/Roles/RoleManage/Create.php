@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware\Roles\RoleManage;
 
-use Closure;
-
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
 
 class Create
@@ -18,13 +17,12 @@ class Create
      */
     public function handle($request, Closure $next)
     {
-
-        if (config('role_manage.RoleManager.Create')){ //Create
+        if (config('role_manage.RoleManager.Create')) { //Create
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
-
     }
 }

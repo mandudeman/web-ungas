@@ -2,34 +2,29 @@
 
 namespace App\Http\Controllers\Reports\Accounts;
 
+use App\BankCash;
+use App\Branch;
 use App\Exports\Balancesheet\BalanceShet;
 use App\Http\Controllers\AccountsReportController;
-use App\Http\Controllers\TransactionController;
-use App\IncomeExpenseType;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-
-use App\Branch;
+use App\Http\Controllers\RoleManageController;
+use App\Http\Controllers\TransactionController;
 use App\IncomeExpenseHead;
-use App\BankCash;
+use App\IncomeExpenseType;
+use App\Setting;
 use App\Transaction;
-
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
-use App\Http\Controllers\RoleManageController;
-use App\Setting;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class BalanceSheetController extends Controller
 {
     public function index()
     {
         return view('admin.accounts-report.balance-sheet.index');
-
     }
 
     /**
@@ -38,7 +33,6 @@ class BalanceSheetController extends Controller
      */
     public function branch_wise(Request $request)
     {
-
         $request->validate([
             'end_from' => 'required',
             'end_to' => 'required',
@@ -49,14 +43,13 @@ class BalanceSheetController extends Controller
         ]);
 
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Statement Of Financial Position Branch Wise Report',
-            'voucher_type' => 'STATEMENT OF FINANCIAL POSITION'
-        );
-
+            'voucher_type' => 'STATEMENT OF FINANCIAL POSITION',
+        ];
 
         $BalanceSheet = $this->getBalanceSheet(
             $request->branch_id,
@@ -73,15 +66,13 @@ class BalanceSheetController extends Controller
             $branch_name = Branch::find($request->branch_id)->name;
         }
 
-
         $start_from = date(config('settings.date_format'), strtotime($request->start_from));
         $start_to = date(config('settings.date_format'), strtotime($request->start_to));
 
         $end_from = date(config('settings.date_format'), strtotime($request->end_from));
         $end_to = date(config('settings.date_format'), strtotime($request->end_to));
 
-
-        $search_by = array(
+        $search_by = [
             'branch_name' => $branch_name,
             'branch_id' => $request->branch_id,
             'start_from' => $start_from,
@@ -89,8 +80,7 @@ class BalanceSheetController extends Controller
 
             'end_from' => $end_from,
             'end_to' => $end_to,
-        );
-
+        ];
 
         // Show Action
         if ($request->action == 'Show') {
@@ -102,7 +92,6 @@ class BalanceSheetController extends Controller
 
         // Pdf Action
         if ($request->action == 'Pdf') {
-
             $pdf = PDF::loadView('admin.accounts-report.profit-or-loss-account.branch-wise.pdf', [
                 'particulars' => $BalanceSheet,
                 'extra' => $extra,
@@ -111,28 +100,23 @@ class BalanceSheetController extends Controller
                 ->setPaper('a4', 'landscape');
 
             //return $pdf->stream(date(config('settings.date_format'), strtotime($extra['current_date_time'])) . '_' . $extra['module_name'] . '.pdf');
-            return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-
+            return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
         }
 
         // Excel Action
         if ($request->action == 'Excel') {
-
             $BranchWise = new BalanceShet([
                 'particulars' => $BalanceSheet,
                 'extra' => $extra,
                 'search_by' => $search_by,
             ]);
-            return Excel::download($BranchWise, $extra['current_date_time'] . '_' . $extra['module_name'] . '.xlsx');
 
+            return Excel::download($BranchWise, $extra['current_date_time'].'_'.$extra['module_name'].'.xlsx');
         }
-
     }
-
 
     public function getBalanceSheet($branch_id, $start_from, $start_to, $end_from, $end_to)
     {
-
 
         //          CAPITAL & LIABILITIES
         //
@@ -185,16 +169,13 @@ class BalanceSheetController extends Controller
         // Total ( NON-CURRENT ASSETS + CURRENT ASSETS + Preliminary Expense )
         //
 
-
         // Unique Branches or single
         $TransactionsController = new TransactionController();
         $transaction_unique_branches = $TransactionsController->getUniqueBranches($branch_id);
 
-
-        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', array(108, 113, 109, 107, 110, 112, 111, 120, 103, 101, 121))
+        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', [108, 113, 109, 107, 110, 112, 111, 120, 103, 101, 121])
             ->orderBy('code', 'asc')
             ->get();
-
 
         $Transactions = new Transaction();
 
@@ -226,239 +207,227 @@ class BalanceSheetController extends Controller
             $end_from,
             $end_to);
 
-
-        $CapitalAndLiabilitiesBalance = array(
+        $CapitalAndLiabilitiesBalance = [
             'start_balance' => 0,
             'end_balance' => 0,
-        );
+        ];
 
-        $AuthorizedCapitalBalance = array(
+        $AuthorizedCapitalBalance = [
             'start_balance' => 0,
             'end_balance' => 0,
-        );
+        ];
 
-
-        $IssuedSubscribedAndPaidUpCapitalBalance = array(
+        $IssuedSubscribedAndPaidUpCapitalBalance = [
             'start_balance' => $Balances[108]['balance']['start_balance'],
             'end_balance' => $Balances[108]['balance']['end_balance'],
-        );
+        ];
 
-        $ShareMoneyDepositBalance = array(
+        $ShareMoneyDepositBalance = [
             'start_balance' => $Balances[113]['balance']['start_balance'],
             'end_balance' => $Balances[113]['balance']['end_balance'],
-        );
+        ];
 
-        $NonCurrentLiabilitiesBalance = array(
+        $NonCurrentLiabilitiesBalance = [
             'start_balance' => $Balances[109]['balance']['start_balance'],
             'end_balance' => $Balances[109]['balance']['end_balance'],
-        );
-        $LongTermLoanBalance = array(
+        ];
+        $LongTermLoanBalance = [
             'start_balance' => $Balances[109]['balance']['start_balance'],
             'end_balance' => $Balances[109]['balance']['end_balance'],
-        );
+        ];
 
-
-        $CurrentLiabilitiesBalance = array(
+        $CurrentLiabilitiesBalance = [
             'start_balance' => $Balances[107]['balance']['start_balance'] + $Balances[110]['balance']['start_balance'] + $Balances[112]['balance']['start_balance'] + $Balances[111]['balance']['start_balance'] + $Balances[120]['balance']['start_balance'],
             'end_balance' => $Balances[107]['balance']['end_balance'] + $Balances[110]['balance']['end_balance'] + $Balances[112]['balance']['end_balance'] + $Balances[111]['balance']['end_balance'] + $Balances[120]['balance']['end_balance'],
-        );
+        ];
 
-        $AccountPayableBalance = array(
+        $AccountPayableBalance = [
             'start_balance' => $Balances[107]['balance']['start_balance'],
             'end_balance' => $Balances[107]['balance']['end_balance'],
-        );
-        $ShortTermLoanBalance = array(
+        ];
+        $ShortTermLoanBalance = [
             'start_balance' => $Balances[110]['balance']['start_balance'],
             'end_balance' => $Balances[110]['balance']['end_balance'],
-        );
-        $AdvanceAgainstSalesBalance = array(
+        ];
+        $AdvanceAgainstSalesBalance = [
             'start_balance' => $Balances[112]['balance']['start_balance'],
             'end_balance' => $Balances[112]['balance']['end_balance'],
-        );
-        $OtherPayableBalance = array(
+        ];
+        $OtherPayableBalance = [
             'start_balance' => $Balances[111]['balance']['start_balance'],
             'end_balance' => $Balances[111]['balance']['end_balance'],
-        );
-        $AdvanceReceiveFromInvestorBalance = array(
+        ];
+        $AdvanceReceiveFromInvestorBalance = [
             'start_balance' => $Balances[120]['balance']['start_balance'],
             'end_balance' => $Balances[120]['balance']['end_balance'],
-        );
-        $TotalCapitalAndLiabilitiesBalance = array(
+        ];
+        $TotalCapitalAndLiabilitiesBalance = [
             'start_balance' => $AuthorizedCapitalBalance['start_balance'] + $IssuedSubscribedAndPaidUpCapitalBalance['start_balance'] + $RetainedEarnings['NetProfitOrLoss']['start_balance'] + $ShareMoneyDepositBalance['start_balance'] + $NonCurrentLiabilitiesBalance['start_balance'] + $CurrentLiabilitiesBalance['start_balance'],
             'end_balance' => $AuthorizedCapitalBalance['end_balance'] + $IssuedSubscribedAndPaidUpCapitalBalance['end_balance'] + $RetainedEarnings['NetProfitOrLoss']['end_balance'] + $ShareMoneyDepositBalance['end_balance'] + $NonCurrentLiabilitiesBalance['end_balance'] + $CurrentLiabilitiesBalance['end_balance'],
-        );
+        ];
 
-
-        $AssetsBalance = array(
+        $AssetsBalance = [
             'start_balance' => 0,
             'end_balance' => 0,
-        );
+        ];
 
         $NonCurrentAssetsBalance = $fixedAssetsSchedule['TotalBalance'];
 
-        $Current_Assets = array(
+        $Current_Assets = [
             'start_balance' => $Balances[103]['balance']['start_balance'] + $Balances[101]['balance']['start_balance'] + $BankCashesBalance['balance']['start_balance'],
             'end_balance' => $Balances[103]['balance']['end_balance'] + $Balances[101]['balance']['end_balance'] + $BankCashesBalance['balance']['end_balance'],
-        );
+        ];
 
-        $AdvanceDepositReceivables = array(
+        $AdvanceDepositReceivables = [
             'start_balance' => $Balances[103]['balance']['start_balance'],
             'end_balance' => $Balances[103]['balance']['end_balance'],
-        );
+        ];
 
-        $InventoriesBalance = array(
+        $InventoriesBalance = [
             'start_balance' => $Balances[101]['balance']['start_balance'],
             'end_balance' => $Balances[101]['balance']['end_balance'],
-        );
+        ];
 
-
-        $CashAndBankBalance = array(
+        $CashAndBankBalance = [
             'start_balance' => $BankCashesBalance['balance']['start_balance'],
             'end_balance' => $BankCashesBalance['balance']['end_balance'],
-        );
+        ];
 
-
-        $PreliminaryExpenseBalance = array(
+        $PreliminaryExpenseBalance = [
             'start_balance' => $Balances[121]['balance']['start_balance'],
             'end_balance' => $Balances[121]['balance']['end_balance'],
-        );
+        ];
 
-
-        $TotalAssetsBalance = array(
+        $TotalAssetsBalance = [
             'start_balance' => $NonCurrentAssetsBalance['start_balance'] + $Current_Assets['start_balance'] + $PreliminaryExpenseBalance['start_balance'],
             'end_balance' => $NonCurrentAssetsBalance['end_balance'] + $Current_Assets['end_balance'] + $PreliminaryExpenseBalance['end_balance'],
-        );
+        ];
 
-
-        $particulars = array(
-            'CapitalAndLiabilities' => array(
+        $particulars = [
+            'CapitalAndLiabilities' => [
                 'name' => 'CAPITAL AND LIABILITIES',
                 'code' => 'particulars',
                 'balance' => $CapitalAndLiabilitiesBalance,
-            ),
-            'AuthorizedCapital' => array(
+            ],
+            'AuthorizedCapital' => [
                 'name' => 'AUTHORIZED CAPITAL',
                 'code' => 'AuthorizedCapital',
                 'balance' => $AuthorizedCapitalBalance,
-            ),
-            'IssuedSubscribedAndPaidUpCapital' => array(
+            ],
+            'IssuedSubscribedAndPaidUpCapital' => [
                 'name' => $Types[108]->name,
                 'code' => 108,
                 'balance' => $IssuedSubscribedAndPaidUpCapitalBalance,
-            ),
-            'RetainEarning' => array(
+            ],
+            'RetainEarning' => [
                 'name' => 'RETAIN EARNING',
                 'code' => 'RetainEarning',
                 'balance' => $RetainedEarnings['NetProfitOrLoss'],
-            ),
-            'ShareMoneyDeposit' => array(
+            ],
+            'ShareMoneyDeposit' => [
                 'name' => $Types[113]->name,
                 'code' => '113',
                 'balance' => $ShareMoneyDepositBalance,
-            ),
-            'NonCurrentLiabilities' => array(
+            ],
+            'NonCurrentLiabilities' => [
                 'name' => 'NON-CURRENT LIABILITIES:',
                 'code' => 'NonCurrentLiabilities',
                 'balance' => $NonCurrentLiabilitiesBalance,
-            ),
-            'LongTermLoan' => array(
+            ],
+            'LongTermLoan' => [
                 'name' => $Types[109]->name,
                 'code' => 109,
                 'balance' => $LongTermLoanBalance,
-            ),
+            ],
 
-
-            'CurrentLiabilities' => array(
+            'CurrentLiabilities' => [
                 'name' => 'CURRENT LIABILITIES:',
                 'code' => 'CurrentLiabilities',
                 'balance' => $CurrentLiabilitiesBalance,
-            ),
-            'AccountPayable' => array(
+            ],
+            'AccountPayable' => [
                 'name' => $Types[107]->name,
                 'code' => 107,
                 'balance' => $AccountPayableBalance,
-            ),
-            'ShortTermLoan' => array(
+            ],
+            'ShortTermLoan' => [
                 'name' => $Types[110]->name,
                 'code' => 110,
                 'balance' => $ShortTermLoanBalance,
-            ),
-            'AdvanceAgainstSales' => array(
+            ],
+            'AdvanceAgainstSales' => [
                 'name' => $Types[112]->name,
                 'code' => 112,
                 'balance' => $AdvanceAgainstSalesBalance,
-            ),
-            'OtherPayable' => array(
+            ],
+            'OtherPayable' => [
                 'name' => $Types[111]->name,
                 'code' => 111,
                 'balance' => $OtherPayableBalance,
-            ),
-            'AdvanceReceiveFromInvestor' => array(
+            ],
+            'AdvanceReceiveFromInvestor' => [
                 'name' => $Types[120]->name,
                 'code' => 120,
                 'balance' => $AdvanceReceiveFromInvestorBalance,
-            ),
-            'TotalCapitalAndLiabilities' => array(
+            ],
+            'TotalCapitalAndLiabilities' => [
                 'name' => 'Total =',
                 'code' => 'TotalCapitalAndLiabilities',
                 'balance' => $TotalCapitalAndLiabilitiesBalance,
-            ),
+            ],
 
-
-            'Assets' => array(
+            'Assets' => [
                 'name' => 'ASSETS',
                 'code' => 'Assets',
                 'balance' => $AssetsBalance,
-            ),
+            ],
 
-            'NonCurrentAssets' => array(
+            'NonCurrentAssets' => [
                 'name' => 'NON-CURRENT ASSETS:',
                 'code' => 'NonCurrentAssets:',
                 'balance' => $NonCurrentAssetsBalance,
-            ),
-            'fixedAssetsSchedule' => array(
+            ],
+            'fixedAssetsSchedule' => [
                 'name' => 'Property, Plant And Equipment',
                 'code' => 'fixedAssetsSchedule',
                 'balance' => $fixedAssetsSchedule['TotalBalance'],
-            ),
-            'CurrentAssets' => array(
+            ],
+            'CurrentAssets' => [
                 'name' => 'CURRENT ASSETS:',
                 'code' => 'CurrentAssets',
                 'balance' => $Current_Assets,
-            ),
+            ],
 
-            'AdvanceDepositReceivables' => array(
+            'AdvanceDepositReceivables' => [
                 'name' => $Types[103]->name,
                 'code' => 103,
                 'balance' => $AdvanceDepositReceivables,
-            ),
-            'Inventories' => array(
+            ],
+            'Inventories' => [
                 'name' => $Types[103]->name,
                 'code' => 103,
                 'balance' => $InventoriesBalance,
-            ),
-            'CashAndBankBalance' => array(
+            ],
+            'CashAndBankBalance' => [
                 'name' => 'Cash And Bank Balance',
                 'code' => 'CashAndBankBalance',
                 'balance' => $CashAndBankBalance,
-            ),
+            ],
 
-            'PreliminaryExpense' => array(
+            'PreliminaryExpense' => [
                 'name' => $Types[121]->name,
                 'code' => 121,
                 'balance' => $PreliminaryExpenseBalance,
-            ),
+            ],
 
-            'TotalAssets' => array(
+            'TotalAssets' => [
                 'name' => 'Total =',
                 'code' => 'TotalAssets',
                 'balance' => $TotalAssetsBalance,
-            ),
+            ],
 
-        );
+        ];
 
         return $particulars;
-
     }
-
 }

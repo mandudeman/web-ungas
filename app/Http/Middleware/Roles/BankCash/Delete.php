@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware\Roles\BankCash;
 
-use Closure;
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
+
 class Delete
 {
     /**
@@ -16,11 +17,11 @@ class Delete
      */
     public function handle($request, Closure $next)
     {
-
         if (config('role_manage.BankCash.Delete')) { //Delete
             return $next($request);
         } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

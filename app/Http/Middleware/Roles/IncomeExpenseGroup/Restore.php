@@ -16,10 +16,11 @@ class Restore
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.LedgerGroup.Restore')){ // Restore
+        if (config('role_manage.LedgerGroup.Restore')) { // Restore
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

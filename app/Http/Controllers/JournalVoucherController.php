@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
-
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Controllers\RoleManageController;
 use App\Setting;
 use App\Transaction;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class JournalVoucherController extends Controller
 {
-
-
 //    Important properties
     public $parentModel = Transaction::class;
+
     public $parentRoute = 'jnl_voucher';
-    public $parentView = "admin.jnl-voucher";
 
-    public $voucher_type = "JV";
+    public $parentView = 'admin.jnl-voucher';
 
+    public $voucher_type = 'JV';
 
     /**
      * Display a listing of the resource.
@@ -32,12 +29,11 @@ class JournalVoucherController extends Controller
      */
     public function index()
     {
-
         $items = $this->parentModel::where('voucher_type', $this->voucher_type)
             ->orderBy('voucher_no', 'desc')
             ->paginate(60);
 
-        return view($this->parentView . '.index')->with('items', $items);
+        return view($this->parentView.'.index')->with('items', $items);
     }
 
     /**
@@ -47,7 +43,7 @@ class JournalVoucherController extends Controller
      */
     public function create()
     {
-        return view($this->parentView . '.create');
+        return view($this->parentView.'.create');
     }
 
     /**
@@ -58,8 +54,6 @@ class JournalVoucherController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $request->validate([
             'branch_id' => 'required',
             'branch_id_cr' => 'required',
@@ -74,7 +68,7 @@ class JournalVoucherController extends Controller
             ->get()
             ->first();
 
-        if (!empty($voucher_info)) {
+        if (! empty($voucher_info)) {
             $voucher_no = $voucher_info->voucher_no + 1;
         } else {
             $voucher_no = 1;
@@ -112,9 +106,9 @@ class JournalVoucherController extends Controller
             ]);
         }
 
-        Session::flash('success', "Successfully  Create");
-        return redirect()->back();
+        Session::flash('success', 'Successfully  Create');
 
+        return redirect()->back();
     }
 
     /**
@@ -132,12 +126,13 @@ class JournalVoucherController extends Controller
             })
             ->get();
 
-        if (count($item)==0) {
-            Session::flash('error', "Item not found");
+        if (count($item) == 0) {
+            Session::flash('error', 'Item not found');
+
             return redirect()->route($this->parentRoute);
         }
-        return view($this->parentView . '.show')->with('items', $item);
 
+        return view($this->parentView.'.show')->with('items', $item);
     }
 
     /**
@@ -154,13 +149,14 @@ class JournalVoucherController extends Controller
             })
             ->get();
 
-        if ( count($items) <= 0) {
-            Session::flash('error', "Item not found");
+        if (count($items) <= 0) {
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
-        $DrItems = array();
-        $CrItems = array();
+        $DrItems = [];
+        $CrItems = [];
         foreach ($items as $item) {
             if ($item->dr > 0) {
                 $DrItems[] = $item;
@@ -168,9 +164,9 @@ class JournalVoucherController extends Controller
                 $CrItems[] = $item;
             }
         }
-        $DrCrItems = array('dr' => $DrItems, 'cr' => $CrItems);
+        $DrCrItems = ['dr' => $DrItems, 'cr' => $CrItems];
 
-        return view($this->parentView . '.edit')->with('items', $DrCrItems);
+        return view($this->parentView.'.edit')->with('items', $DrCrItems);
     }
 
     /**
@@ -182,7 +178,6 @@ class JournalVoucherController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
             'branch_id' => 'required',
             'branch_id_cr' => 'required',
@@ -197,15 +192,15 @@ class JournalVoucherController extends Controller
                 $q->where('voucher_no', '=', $id);
             })
             ->get();
-        $created_by=$items[0]->created_by;
-        $created_at=$items[0]->created_at;
+        $created_by = $items[0]->created_by;
+        $created_at = $items[0]->created_at;
         $this->kill($id); /// Old Item kill then new items created
 
         foreach ($request->income_expense_head_id as $key => $income_expense_head_id) {
             if ($income_expense_head_id == 0) {
                 continue;
             }
-            $d_model=$this->parentModel::create([
+            $d_model = $this->parentModel::create([
                 'voucher_no' => $id,
                 'branch_id' => $request->branch_id,
                 'voucher_type' => $this->voucher_type,
@@ -218,7 +213,7 @@ class JournalVoucherController extends Controller
                 'updated_by' => \Auth::user()->email,
             ]);
 
-            $d_model->created_at=$created_at;
+            $d_model->created_at = $created_at;
             $d_model->save();
         }
 
@@ -226,7 +221,7 @@ class JournalVoucherController extends Controller
             if ($income_expense_head_id_cr == 0) {
                 continue;
             }
-            $c_model=$this->parentModel::create([
+            $c_model = $this->parentModel::create([
                 'voucher_no' => $id,
                 'branch_id' => $request->branch_id_cr,
                 'voucher_type' => $this->voucher_type,
@@ -239,19 +234,17 @@ class JournalVoucherController extends Controller
                 'updated_by' => \Auth::user()->email,
             ]);
 
-            $c_model->created_at=$created_at;
+            $c_model->created_at = $created_at;
             $c_model->save();
-
         }
 
+        Session::flash('success', 'Update Successfully');
 
-        Session::flash('success', "Update Successfully");
         return redirect()->route($this->parentRoute);
     }
 
     public function pdf(Request $request)
     {
-
         $id = $request->id;
         $item = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
@@ -260,29 +253,27 @@ class JournalVoucherController extends Controller
             ->get();
 
         if (count($item) == 0) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->route($this->parentRoute);
         }
 
-
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Journal Voucher Report',
-            'voucher_type' => 'JOURNAL VOUCHER'
-        );
+            'voucher_type' => 'JOURNAL VOUCHER',
+        ];
 
         // return view('admin.dr-voucher.pdf');
 
-        $pdf = PDF::loadView($this->parentView . '.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView($this->parentView.'.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
 
         //return $pdf->stream($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-         return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -292,14 +283,14 @@ class JournalVoucherController extends Controller
      */
     public function destroy($id)
     {
-
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
                 $q->where('voucher_no', '=', $id);
             })
             ->get();
         if (count($items) < 1) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
         foreach ($items as $item) {
@@ -310,7 +301,8 @@ class JournalVoucherController extends Controller
         foreach ($items as $item) {
             $item->delete();
         }
-        Session::flash('success', "Successfully Trashed");
+        Session::flash('success', 'Successfully Trashed');
+
         return redirect()->back();
     }
 
@@ -320,10 +312,10 @@ class JournalVoucherController extends Controller
             ->onlyTrashed()
             ->orderBy('deleted_at', 'desc')
             ->paginate(60);
-        return view($this->parentView . '.trashed')
-            ->with("items", $items);
-    }
 
+        return view($this->parentView.'.trashed')
+            ->with('items', $items);
+    }
 
     public function restore($id)
     {
@@ -342,6 +334,7 @@ class JournalVoucherController extends Controller
         }
 
         Session::flash('success', 'Successfully Restore');
+
         return redirect()->back();
     }
 
@@ -359,80 +352,75 @@ class JournalVoucherController extends Controller
             $item->forceDelete();
         }
         Session::flash('success', 'Permanently Delete');
+
         return redirect()->back();
     }
 
     public function activeSearch(Request $request)
     {
-        $search = $request["search"];
+        $search = $request['search'];
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('IncomeExpenseHead', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->paginate(60);
 
-
-        return view($this->parentView . '.index')
+        return view($this->parentView.'.index')
             ->with('items', $items);
-
     }
 
     public function trashedSearch(Request $request)
     {
-
-        $search = $request["search"];
+        $search = $request['search'];
 
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->onlyTrashed()
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('IncomeExpenseHead', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->onlyTrashed()
             ->orderBy('created_at', 'dsc')
             ->paginate(60);
 
-        return view($this->parentView . '.trashed')
+        return view($this->parentView.'.trashed')
             ->with('items', $items);
-
     }
-
 
 //    Fixed Method for all
     public function activeAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 3 || $request->apply_comand_bottom == 3) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->where(function ($q) use ($id) {
                         $q->where('voucher_no', '=', $id);
@@ -445,11 +433,8 @@ class JournalVoucherController extends Controller
             }
 
             return redirect()->back();
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
-
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->withTrashed()
                     ->where(function ($q) use ($id) {
@@ -462,24 +447,23 @@ class JournalVoucherController extends Controller
                 }
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
-
     }
 
     public function trashedAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 1 || $request->apply_comand_bottom == 1) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->onlyTrashed()
                     ->where(function ($q) use ($id) {
@@ -492,10 +476,8 @@ class JournalVoucherController extends Controller
                 }
                 $this->restore($id);
             }
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->onlyTrashed()
                     ->where(function ($q) use ($id) {
@@ -509,14 +491,14 @@ class JournalVoucherController extends Controller
 
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
+
         return redirect()->back();
     }
-
-
 }

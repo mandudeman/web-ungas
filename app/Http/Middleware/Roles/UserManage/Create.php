@@ -3,7 +3,6 @@
 namespace App\Http\Middleware\Roles\UserManage;
 
 use Closure;
-
 use Illuminate\Support\Facades\Session;
 
 class Create
@@ -17,11 +16,12 @@ class Create
      */
     public function handle($request, Closure $next)
     {
-        $UserCreate=config('role_manage.User.Create');
-        if ($UserCreate){ // Create
+        $UserCreate = config('role_manage.User.Create');
+        if ($UserCreate) { // Create
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

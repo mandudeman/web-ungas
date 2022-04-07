@@ -2,29 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-
-use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Controllers\RoleManageController;
 use App\Setting;
 use App\Transaction;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Session;
 
 class ContraVoucherController extends Controller
 {
-
-
 //    Important properties
     public $parentModel = Transaction::class;
+
     public $parentRoute = 'contra_voucher';
-    public $parentView = "admin.cnt-voucher";
 
-    public $voucher_type = "Contra";
+    public $parentView = 'admin.cnt-voucher';
 
+    public $voucher_type = 'Contra';
 
     /**
      * Display a listing of the resource.
@@ -37,7 +33,7 @@ class ContraVoucherController extends Controller
             ->orderBy('voucher_no', 'desc')
             ->paginate(60);
 
-        return view($this->parentView . '.index')->with('items', $items);
+        return view($this->parentView.'.index')->with('items', $items);
     }
 
     /**
@@ -47,7 +43,7 @@ class ContraVoucherController extends Controller
      */
     public function create()
     {
-        return view($this->parentView . '.create');
+        return view($this->parentView.'.create');
     }
 
     /**
@@ -58,7 +54,6 @@ class ContraVoucherController extends Controller
      */
     public function store(Request $request)
     {
-
         $request->validate([
             'branch_id' => 'required',
             'bank_cash_id' => 'required',
@@ -75,7 +70,7 @@ class ContraVoucherController extends Controller
             ->get()
             ->first();
 
-        if (!empty($voucher_info)) {
+        if (! empty($voucher_info)) {
             $voucher_no = $voucher_info->voucher_no + 1;
         } else {
             $voucher_no = 1;
@@ -114,10 +109,9 @@ class ContraVoucherController extends Controller
             'created_by' => \Auth::user()->email,
         ]);
 
+        Session::flash('success', 'Successfully  Create');
 
-        Session::flash('success', "Successfully  Create");
         return redirect()->back();
-
     }
 
     /**
@@ -135,12 +129,13 @@ class ContraVoucherController extends Controller
             })
             ->get();
 
-        if (count($item)=='on') {
-            Session::flash('error', "Item not found");
+        if (count($item) == 'on') {
+            Session::flash('error', 'Item not found');
+
             return redirect()->route($this->parentRoute);
         }
-        return view($this->parentView . '.show')->with('items', $item);
 
+        return view($this->parentView.'.show')->with('items', $item);
     }
 
     /**
@@ -158,11 +153,12 @@ class ContraVoucherController extends Controller
             ->get();
 
         if (count($items) <= 0) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
-        return view($this->parentView . '.edit')->with('items', $items);
+        return view($this->parentView.'.edit')->with('items', $items);
     }
 
     /**
@@ -174,7 +170,6 @@ class ContraVoucherController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
             'branch_id' => 'required',
             'bank_cash_id' => 'required',
@@ -184,7 +179,8 @@ class ContraVoucherController extends Controller
         ]);
 
         if ($request->bank_cash_id == $request->bank_cash_id_cr and $request->bank_cash_id != 0 and $request->bank_cash_id_cr != 0) {
-            Session::flash('error', "Bank Cash ( Dr ) and Bank Cash ( Cr ) should not same");
+            Session::flash('error', 'Bank Cash ( Dr ) and Bank Cash ( Cr ) should not same');
+
             return redirect()->back();
         }
 
@@ -223,13 +219,13 @@ class ContraVoucherController extends Controller
 
         $cr_items->save();
 
-        Session::flash('success', "Update Successfully");
+        Session::flash('success', 'Update Successfully');
+
         return redirect()->route($this->parentRoute);
     }
 
     public function pdf(Request $request)
     {
-
         $id = $request->id;
         $item = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
@@ -238,28 +234,27 @@ class ContraVoucherController extends Controller
             ->get();
 
         if (count($item) == 0) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->route($this->parentRoute);
         }
 
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Contra Voucher Report',
-            'voucher_type' => 'CONTRA VOUCHER'
-        );
+            'voucher_type' => 'CONTRA VOUCHER',
+        ];
 
         // return view('admin.dr-voucher.pdf');
 
-        $pdf = PDF::loadView($this->parentView . '.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView($this->parentView.'.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
 
-       // return $pdf->stream($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-         return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        // return $pdf->stream($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -269,14 +264,14 @@ class ContraVoucherController extends Controller
      */
     public function destroy($id)
     {
-
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
                 $q->where('voucher_no', '=', $id);
             })
             ->get();
         if (count($items) < 1) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
         foreach ($items as $item) {
@@ -287,7 +282,8 @@ class ContraVoucherController extends Controller
         foreach ($items as $item) {
             $item->delete();
         }
-        Session::flash('success', "Successfully Trashed");
+        Session::flash('success', 'Successfully Trashed');
+
         return redirect()->back();
     }
 
@@ -297,10 +293,10 @@ class ContraVoucherController extends Controller
             ->onlyTrashed()
             ->orderBy('deleted_at', 'desc')
             ->paginate(60);
-        return view($this->parentView . '.trashed')
-            ->with("items", $items);
-    }
 
+        return view($this->parentView.'.trashed')
+            ->with('items', $items);
+    }
 
     public function restore($id)
     {
@@ -319,6 +315,7 @@ class ContraVoucherController extends Controller
         }
 
         Session::flash('success', 'Successfully Restore');
+
         return redirect()->back();
     }
 
@@ -336,81 +333,77 @@ class ContraVoucherController extends Controller
             $item->forceDelete();
         }
         Session::flash('success', 'Permanently Delete');
+
         return redirect()->back();
     }
 
     public function activeSearch(Request $request)
     {
-        $search = $request["search"];
+        $search = $request['search'];
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('cheque_number', '=', $search)
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('IncomeExpenseHead', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->paginate(60);
 
-
-        return view($this->parentView . '.index')
+        return view($this->parentView.'.index')
             ->with('items', $items);
-
     }
 
     public function trashedSearch(Request $request)
     {
-        $search = $request["search"];
+        $search = $request['search'];
 
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->onlyTrashed()
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('cheque_number', '=', $search)
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('IncomeExpenseHead', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->onlyTrashed()
             ->orderBy('created_at', 'dsc')
             ->paginate(60);
 
-        return view($this->parentView . '.trashed')
+        return view($this->parentView.'.trashed')
             ->with('items', $items);
-
     }
-
 
 //    Fixed Method for all
     public function activeAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 3 || $request->apply_comand_bottom == 3) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->where(function ($q) use ($id) {
                         $q->where('voucher_no', '=', $id);
@@ -423,11 +416,8 @@ class ContraVoucherController extends Controller
             }
 
             return redirect()->back();
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
-
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->withTrashed()
                     ->where(function ($q) use ($id) {
@@ -440,24 +430,23 @@ class ContraVoucherController extends Controller
                 }
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
-
     }
 
     public function trashedAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 1 || $request->apply_comand_bottom == 1) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->onlyTrashed()
                     ->where(function ($q) use ($id) {
@@ -470,10 +459,8 @@ class ContraVoucherController extends Controller
                 }
                 $this->restore($id);
             }
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                     ->onlyTrashed()
                     ->where(function ($q) use ($id) {
@@ -487,14 +474,14 @@ class ContraVoucherController extends Controller
 
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
+
         return redirect()->back();
     }
-
-
 }
