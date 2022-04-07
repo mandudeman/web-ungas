@@ -31,8 +31,8 @@ use App\Http\Controllers\Reports;
 use App\Http\Controllers\RoleManageController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 Route::get('config-clear', function () {
     Artisan::call('cache:clear');

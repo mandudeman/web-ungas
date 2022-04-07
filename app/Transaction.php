@@ -14,7 +14,6 @@ class Transaction extends Model
     use Notifiable;
     use SoftDeletes;
 
-
     protected $fillable = [
         'voucher_no',
         'branch_id',
