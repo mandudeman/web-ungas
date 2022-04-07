@@ -2,25 +2,24 @@
 
 namespace App\Exports\Ledger;
 
+use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
-use Illuminate\Contracts\View\View;
 
 class BankCashWise implements FromView
 {
-
     protected $items;
-    protected $extra;
-    protected $transaction_bank_cash_views;
 
+    protected $extra;
+
+    protected $transaction_bank_cash_views;
 
     public function __construct($branch_wise_ledger)
     {
-        $this->items=$branch_wise_ledger['items'];
-        $this->extra=$branch_wise_ledger['extra'];
-        $this->transaction_bank_cash_views=$branch_wise_ledger['transaction_bank_cash_views'];
+        $this->items = $branch_wise_ledger['items'];
+        $this->extra = $branch_wise_ledger['extra'];
+        $this->transaction_bank_cash_views = $branch_wise_ledger['transaction_bank_cash_views'];
     }
-
 
     public function view(): View
     {

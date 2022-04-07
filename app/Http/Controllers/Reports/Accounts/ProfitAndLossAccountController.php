@@ -2,34 +2,28 @@
 
 namespace App\Http\Controllers\Reports\Accounts;
 
-use App\Exports\ProfitOrLossAccount\BranchWise;
-use App\Http\Controllers\TransactionController;
-use App\IncomeExpenseType;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-
-use App\Branch;
-use App\IncomeExpenseHead;
 use App\BankCash;
+use App\Branch;
+use App\Exports\ProfitOrLossAccount\BranchWise;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\RoleManageController;
+use App\Http\Controllers\TransactionController;
+use App\IncomeExpenseHead;
+use App\IncomeExpenseType;
+use App\Setting;
 use App\Transaction;
-
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
-use App\Http\Controllers\RoleManageController;
-use App\Setting;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class ProfitAndLossAccountController extends Controller
 {
     public function index()
     {
-
         return view('admin.accounts-report.profit-or-loss-account.index');
-
-
     }
 
     public function branch_wise(Request $request)
@@ -44,13 +38,13 @@ class ProfitAndLossAccountController extends Controller
         ]);
 
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Profit And Loss Account Branch Wise Report',
-            'voucher_type' => 'PROFIT OR LOSS ACCOUNT'
-        );
+            'voucher_type' => 'PROFIT OR LOSS ACCOUNT',
+        ];
 
 //        Get Profit Or Loss
         $ProfitOrLoss = $this->getProfitOrLoss(
@@ -60,7 +54,6 @@ class ProfitAndLossAccountController extends Controller
             $request->end_from,
             $request->end_to);
 
-
         // Common items
 
         if ($request->branch_id == 0) {
@@ -69,15 +62,13 @@ class ProfitAndLossAccountController extends Controller
             $branch_name = Branch::find($request->branch_id)->name;
         }
 
-
         $start_from = date(config('settings.date_format'), strtotime($request->start_from));
         $start_to = date(config('settings.date_format'), strtotime($request->start_to));
 
         $end_from = date(config('settings.date_format'), strtotime($request->end_from));
         $end_to = date(config('settings.date_format'), strtotime($request->end_to));
 
-
-        $search_by = array(
+        $search_by = [
             'branch_name' => $branch_name,
             'branch_id' => $request->branch_id,
             'start_from' => $start_from,
@@ -85,8 +76,7 @@ class ProfitAndLossAccountController extends Controller
 
             'end_from' => $end_from,
             'end_to' => $end_to,
-        );
-
+        ];
 
         // Show Action
         if ($request->action == 'Show') {
@@ -98,7 +88,6 @@ class ProfitAndLossAccountController extends Controller
 
         // Pdf Action
         if ($request->action == 'Pdf') {
-
             $pdf = PDF::loadView('admin.accounts-report.profit-or-loss-account.branch-wise.pdf', [
                 'particulars' => $ProfitOrLoss['Particulars'],
                 'extra' => $extra,
@@ -107,24 +96,19 @@ class ProfitAndLossAccountController extends Controller
                 ->setPaper('a4', 'landscape');
 
             //return $pdf->stream(date(config('settings.date_format'), strtotime($extra['current_date_time'])) . '_' . $extra['module_name'] . '.pdf');
-            return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-
+            return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
         }
 
         // Excel Action
         if ($request->action == 'Excel') {
-
             $BranchWise = new BranchWise([
                 'particulars' => $ProfitOrLoss['Particulars'],
                 'extra' => $extra,
                 'search_by' => $search_by,
             ]);
-            return Excel::download($BranchWise, $extra['current_date_time'] . '_' . $extra['module_name'] . '.xlsx');
 
+            return Excel::download($BranchWise, $extra['current_date_time'].'_'.$extra['module_name'].'.xlsx');
         }
-
-
-
     }
 
     public function getProfitOrLoss($branch_id, $start_from, $start_to, $end_from, $end_to)
@@ -133,7 +117,6 @@ class ProfitAndLossAccountController extends Controller
         // Unique Branches or single
         $TransactionsController = new TransactionController();
         $transaction_unique_branches = $TransactionsController->getUniqueBranches($branch_id);
-
 
         //  Profit & Loss Account
         //
@@ -161,8 +144,7 @@ class ProfitAndLossAccountController extends Controller
         //
         // Net Profit/ (Loss) ( Income After Tax & Interest )
 
-
-        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', array(105, 106, 116, 117))
+        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', [105, 106, 116, 117])
             ->orderBy('code', 'asc')
             ->get();
 
@@ -189,104 +171,101 @@ class ProfitAndLossAccountController extends Controller
             $end_to
         );
 
-
         $Revenue = $Balance[$CostOfRevenueHeadTypes[0]->code]['balance'];
 
-        $GrossProfit = array(
+        $GrossProfit = [
             'start_balance' => $Revenue['start_balance'] - $CostOfRevenue['start_balance'],
             'end_balance' => $Revenue['end_balance'] - $CostOfRevenue['end_balance'],
-        );
+        ];
         $IndirectIncome = $Balance[$CostOfRevenueHeadTypes[1]->code]['balance'];
 
-        $IncomeFromOperation = array(
+        $IncomeFromOperation = [
             'start_balance' => $GrossProfit['start_balance'] + $IndirectIncome['start_balance'],
             'end_balance' => $GrossProfit['end_balance'] + $IndirectIncome['end_balance'],
-        );
+        ];
         $AdministrationExpenses = $Balance[$CostOfRevenueHeadTypes[2]->code]['balance'];
 
-        $IncomeBeforeTaxAndInterest = array(
+        $IncomeBeforeTaxAndInterest = [
             'start_balance' => $IncomeFromOperation['start_balance'] - $AdministrationExpenses['start_balance'],
             'end_balance' => $IncomeFromOperation['end_balance'] - $AdministrationExpenses['end_balance'],
-        );
+        ];
         $FinancialExpense = $Balance[$CostOfRevenueHeadTypes[3]->code]['balance'];
 
-        $IncomeAfterTaxAndInterest = array(
+        $IncomeAfterTaxAndInterest = [
             'start_balance' => $IncomeBeforeTaxAndInterest['start_balance'] - $FinancialExpense['start_balance'],
             'end_balance' => $IncomeBeforeTaxAndInterest['end_balance'] - $FinancialExpense['end_balance'],
-        );
+        ];
 
-        $ProvisionAndTaxPaid = array(
+        $ProvisionAndTaxPaid = [
             'start_balance' => 0,
             'end_balance' => 0,
-        );
+        ];
 
         $NetProfitOrLoss = $IncomeAfterTaxAndInterest;
 
-        $particulars = array(
-            'Revenue' => array(
+        $particulars = [
+            'Revenue' => [
                 'name' => $CostOfRevenueHeadTypes[0]->name,
                 'code' => $CostOfRevenueHeadTypes[0]->code,
                 'balance' => $Revenue,
-            ),
-            'CostOfRevenue' => array(
+            ],
+            'CostOfRevenue' => [
                 'name' => 'Cost Of Revenue',
                 'code' => 'CostOfRevenue',
                 'balance' => $CostOfRevenue,
-            ),
-            'GrossProfit' => array(
+            ],
+            'GrossProfit' => [
                 'name' => 'Gross Profit',
                 'code' => 'GrossProfit',
                 'balance' => $GrossProfit,
-            ),
-            'IndirectIncome' => array(
+            ],
+            'IndirectIncome' => [
                 'name' => $CostOfRevenueHeadTypes[1]->name,
                 'code' => $CostOfRevenueHeadTypes[1]->code,
                 'balance' => $IndirectIncome,
-            ),
-            'IncomeFromOperation' => array(
+            ],
+            'IncomeFromOperation' => [
                 'name' => 'Income From Operation',
                 'code' => 'IncomeFromOperation',
                 'balance' => $IncomeFromOperation,
-            ),
-            'AdministrationExpenses' => array(
+            ],
+            'AdministrationExpenses' => [
                 'name' => $CostOfRevenueHeadTypes[2]->name,
                 'code' => $CostOfRevenueHeadTypes[2]->code,
                 'balance' => $AdministrationExpenses,
-            ),
-            'IncomeBeforeTaxAndInterest' => array(
+            ],
+            'IncomeBeforeTaxAndInterest' => [
                 'name' => 'Income Before Tax And Interest',
                 'code' => 'IncomeBeforeTaxAndInterest',
                 'balance' => $IncomeBeforeTaxAndInterest,
-            ),
-            'FinancialExpense' => array(
+            ],
+            'FinancialExpense' => [
                 'name' => $CostOfRevenueHeadTypes[3]->name,
                 'code' => $CostOfRevenueHeadTypes[3]->code,
                 'balance' => $FinancialExpense,
-            ),
-            'IncomeAfterTaxAndInterest' => array(
+            ],
+            'IncomeAfterTaxAndInterest' => [
                 'name' => 'Income After Tax And Interest',
                 'code' => 'IncomeAfterTaxAndInterest',
                 'balance' => $IncomeAfterTaxAndInterest,
-            ),
-            'ProvisionAndTaxPaid' => array(
+            ],
+            'ProvisionAndTaxPaid' => [
                 'name' => 'Provision And Tax Paid',
                 'code' => 'ProvisionAndTaxPaid',
                 'balance' => $ProvisionAndTaxPaid,
-            ),
-            'NetProfitOrLoss' => array(
+            ],
+            'NetProfitOrLoss' => [
                 'name' => 'Net Profit/ (Loss)',
                 'code' => 'ProvisionAndTaxPaid',
                 'balance' => $NetProfitOrLoss,
-            ),
-        );
+            ],
+        ];
 
-        $data = array(
+        $data = [
             'Particulars' => $particulars,
             'NetProfitOrLoss' => $NetProfitOrLoss,
-        );
+        ];
 
         return $data;
-
     }
-
 }

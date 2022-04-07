@@ -16,10 +16,11 @@ class Edit
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.LedgerGroup.Edit')){ //Edit
+        if (config('role_manage.LedgerGroup.Edit')) { //Edit
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

@@ -37,7 +37,7 @@ class IncomeExpenseGroupsTableSeeder extends Seeder
         App\IncomeExpenseGroup::create([
             'name' => 'Cable',
             'code' => '105',
-            'created_by' => 'E-Accounts System',// id =5
+            'created_by' => 'E-Accounts System', // id =5
         ]);
 
         App\IncomeExpenseGroup::create([
@@ -262,12 +262,5 @@ class IncomeExpenseGroupsTableSeeder extends Seeder
             'code' => '143',
             'created_by' => 'E-Accounts System', // id =43
         ]);
-
-
-
-
-
-
-
     }
 }

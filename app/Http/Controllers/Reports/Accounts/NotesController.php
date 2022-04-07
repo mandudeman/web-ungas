@@ -2,27 +2,23 @@
 
 namespace App\Http\Controllers\Reports\Accounts;
 
+use App\BankCash;
+use App\Branch;
 use App\Exports\Notes\LedgerGroupWise;
 use App\Exports\Notes\LedgerTypeWise;
-use App\IncomeExpenseGroup;
-use App\IncomeExpenseType;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-
-use App\Branch;
+use App\Http\Controllers\RoleManageController;
+use App\IncomeExpenseGroup;
 use App\IncomeExpenseHead;
-use App\BankCash;
+use App\IncomeExpenseType;
+use App\Setting;
 use App\Transaction;
-
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
-use App\Http\Controllers\RoleManageController;
-use App\Setting;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class NotesController extends Controller
 {
@@ -33,7 +29,6 @@ class NotesController extends Controller
 
     public function type_wise(Request $request)
     {
-
         $request->validate([
             'end_from' => 'required',
             'end_to' => 'required',
@@ -43,16 +38,14 @@ class NotesController extends Controller
 
         ]);
 
-
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Notes Type Wise Report',
-            'voucher_type' => 'NOTES'
-        );
-
+            'voucher_type' => 'NOTES',
+        ];
 
         if ($request->branch_id > 0) {
             $transaction_unique_branches = DB::table('transaction_branch_view')
@@ -63,27 +56,23 @@ class NotesController extends Controller
                 ->get();
         }
 
-
         if (count($transaction_unique_branches) < 1) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->route('reports.accounts.notes');
         }
 
-
-        if ($request->income_expense_type_code > 0)
-        {
+        if ($request->income_expense_type_code > 0) {
             $IncomeExpenseTypes = IncomeExpenseType::where('code', $request->income_expense_type_code)
                 ->get();
-
-        }else{
-            $IncomeExpenseTypes = IncomeExpenseType::orderBy('code','asc')
+        } else {
+            $IncomeExpenseTypes = IncomeExpenseType::orderBy('code', 'asc')
             ->get();
         }
 
         $Transactions = new Transaction();
 
         foreach ($IncomeExpenseTypes as $IncomeExpenseType) {
-
             $Balance[$IncomeExpenseType->name] = $Transactions->getBalanceByIncExpHeadTypeIdBranchesTwoDate(
                 $IncomeExpenseType->id,
                 $transaction_unique_branches,
@@ -92,13 +81,8 @@ class NotesController extends Controller
                 $request->end_from,
                 $request->end_to
             );
-            $income_expense_type_name =$IncomeExpenseType->name;
-
-
+            $income_expense_type_name = $IncomeExpenseType->name;
         }
-
-
-
 
         // Common items
 
@@ -108,14 +92,9 @@ class NotesController extends Controller
             $branch_name = Branch::find($request->branch_id)->name;
         }
 
-
         if ($request->income_expense_type_code == 0) {
             $income_expense_type_name = 'All Ledger Type';
         }
-
-
-
-
 
         $start_from = date(config('settings.date_format'), strtotime($request->start_from));
         $start_to = date(config('settings.date_format'), strtotime($request->start_to));
@@ -123,8 +102,7 @@ class NotesController extends Controller
         $end_from = date(config('settings.date_format'), strtotime($request->end_from));
         $end_to = date(config('settings.date_format'), strtotime($request->end_to));
 
-
-        $search_by = array(
+        $search_by = [
             'branch_name' => $branch_name,
             'branch_id' => $request->branch_id,
             'income_expense_type_name'=>$income_expense_type_name,
@@ -133,8 +111,7 @@ class NotesController extends Controller
 
             'end_from' => $end_from,
             'end_to' => $end_to,
-        );
-
+        ];
 
         // Show Action
         if ($request->action == 'Show') {
@@ -144,10 +121,8 @@ class NotesController extends Controller
                 ->with('search_by', $search_by);
         }
 
-
         // Pdf Action
         if ($request->action == 'Pdf') {
-
             $pdf = PDF::loadView('admin.accounts-report.notes.type-wise.pdf', [
                 'particulars' => $Balance,
                 'extra' => $extra,
@@ -157,30 +132,23 @@ class NotesController extends Controller
                 ->setPaper('a4', 'landscape');
 
             //return $pdf->stream(date(config('settings.date_format'), strtotime($extra['current_date_time'])) . '_' . $extra['module_name'] . '.pdf');
-            return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-
+            return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
         }
-
 
         // Excel Action
         if ($request->action == 'Excel') {
-
             $BranchWise = new LedgerTypeWise([
                 'particulars' => $Balance,
                 'extra' => $extra,
                 'search_by' => $search_by,
             ]);
-            return Excel::download($BranchWise, $extra['current_date_time'] . '_' . $extra['module_name'] . '.xlsx');
 
+            return Excel::download($BranchWise, $extra['current_date_time'].'_'.$extra['module_name'].'.xlsx');
         }
-
-
     }
-
 
     public function group_wise(Request $request)
     {
-
         $request->validate([
             'end_from1' => 'required',
             'end_to1' => 'required',
@@ -190,16 +158,14 @@ class NotesController extends Controller
 
         ]);
 
-
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Ledger Group Wise Report',
-            'voucher_type' => 'NOTES'
-        );
-
+            'voucher_type' => 'NOTES',
+        ];
 
         if ($request->branch_id > 0) {
             $transaction_unique_branches = DB::table('transaction_branch_view')
@@ -210,29 +176,23 @@ class NotesController extends Controller
                 ->get();
         }
 
-
         if (count($transaction_unique_branches) < 1) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->route('reports.accounts.notes');
         }
 
-
-        if ($request->income_expense_group_code > 0)
-        {
+        if ($request->income_expense_group_code > 0) {
             $IncomeExpenseGroups = IncomeExpenseGroup::where('code', $request->income_expense_group_code)
                 ->get();
-
-        }else{
-            $IncomeExpenseGroups = IncomeExpenseGroup::orderBy('code','asc')
+        } else {
+            $IncomeExpenseGroups = IncomeExpenseGroup::orderBy('code', 'asc')
                 ->get();
         }
 
         $Transactions = new Transaction();
 
-
-
         foreach ($IncomeExpenseGroups as $IncomeExpenseGroup) {
-
             $Balance[$IncomeExpenseGroup->name] = $Transactions->getBalanceByIncExpHeadGroupIdBranchesTwoDate(
                 $IncomeExpenseGroup->id,
                 $transaction_unique_branches,
@@ -241,12 +201,8 @@ class NotesController extends Controller
                 $request->end_from1,
                 $request->end_to1
             );
-            $income_expense_group_name =$IncomeExpenseGroup->name;
-
-
+            $income_expense_group_name = $IncomeExpenseGroup->name;
         }
-
-
 
         // Common items
 
@@ -256,12 +212,9 @@ class NotesController extends Controller
             $branch_name = Branch::find($request->branch_id)->name;
         }
 
-
         if ($request->income_expense_group_code == 0) {
             $income_expense_group_name = 'All Ledger Group';
         }
-
-
 
         $start_from = date(config('settings.date_format'), strtotime($request->start_from1));
         $start_to = date(config('settings.date_format'), strtotime($request->start_to1));
@@ -269,8 +222,7 @@ class NotesController extends Controller
         $end_from = date(config('settings.date_format'), strtotime($request->end_from1));
         $end_to = date(config('settings.date_format'), strtotime($request->end_to1));
 
-
-        $search_by = array(
+        $search_by = [
             'branch_name' => $branch_name,
             'branch_id' => $request->branch_id,
             'income_expense_group_name'=>$income_expense_group_name,
@@ -279,8 +231,7 @@ class NotesController extends Controller
 
             'end_from' => $end_from,
             'end_to' => $end_to,
-        );
-
+        ];
 
         // Show Action
         if ($request->action == 'Show') {
@@ -290,10 +241,8 @@ class NotesController extends Controller
                 ->with('search_by', $search_by);
         }
 
-
         // Pdf Action
         if ($request->action == 'Pdf') {
-
             $pdf = PDF::loadView('admin.accounts-report.notes.group-wise.pdf', [
                 'particulars' => $Balance,
                 'extra' => $extra,
@@ -303,28 +252,18 @@ class NotesController extends Controller
                 ->setPaper('a4', 'landscape');
 
             //return $pdf->stream(date(config('settings.date_format'), strtotime($extra['current_date_time'])) . '_' . $extra['module_name'] . '.pdf');
-             return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-
+            return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
         }
-
 
         // Excel Action
         if ($request->action == 'Excel') {
-
             $BranchWise = new LedgerGroupWise([
                 'particulars' => $Balance,
                 'extra' => $extra,
                 'search_by' => $search_by,
             ]);
-            return Excel::download($BranchWise, $extra['current_date_time'] . '_' . $extra['module_name'] . '.xlsx');
 
+            return Excel::download($BranchWise, $extra['current_date_time'].'_'.$extra['module_name'].'.xlsx');
         }
-
-
-
-
-
     }
-
-
 }

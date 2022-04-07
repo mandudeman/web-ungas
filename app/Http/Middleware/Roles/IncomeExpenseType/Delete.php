@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware\Roles\IncomeExpenseType;
 
-use Closure;
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
 
 class Delete
@@ -21,6 +21,7 @@ class Delete
             return $next($request);
         } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

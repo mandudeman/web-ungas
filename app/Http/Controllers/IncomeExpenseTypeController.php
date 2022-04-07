@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\IncomeExpenseType;
-use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Controllers\RoleManageController;
+use App\IncomeExpenseType;
 use App\Setting;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class IncomeExpenseTypeController extends Controller
 {
-
-
 //    Important properties
     public $parentModel = IncomeExpenseType::class;
-    public $parentRoute = 'income_expense_type';
-    public $parentView = "admin.income-expense-type";
 
+    public $parentRoute = 'income_expense_type';
+
+    public $parentView = 'admin.income-expense-type';
 
     /**
      * Display a listing of the resource.
@@ -28,7 +26,8 @@ class IncomeExpenseTypeController extends Controller
     public function index()
     {
         $items = $this->parentModel::orderBy('code', 'asc')->paginate(60);
-        return view($this->parentView . '.index')->with('items', $items);
+
+        return view($this->parentView.'.index')->with('items', $items);
     }
 
     /**
@@ -38,8 +37,7 @@ class IncomeExpenseTypeController extends Controller
      */
     public function create()
     {
-
-        return view($this->parentView . '.create');
+        return view($this->parentView.'.create');
     }
 
     /**
@@ -62,9 +60,9 @@ class IncomeExpenseTypeController extends Controller
             'created_by' => \Auth::user()->email,
 
         ]);
-        Session::flash('success', "Successfully  Create");
-        return redirect()->back();
+        Session::flash('success', 'Successfully  Create');
 
+        return redirect()->back();
     }
 
     /**
@@ -77,11 +75,12 @@ class IncomeExpenseTypeController extends Controller
     {
         $item = $this->parentModel::find($request->id);
         if (empty($item)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
-        return view($this->parentView . '.show')->with('items', $item);
 
+        return view($this->parentView.'.show')->with('items', $item);
     }
 
     /**
@@ -92,15 +91,15 @@ class IncomeExpenseTypeController extends Controller
      */
     public function edit($id)
     {
-
         $items = $this->parentModel::find($id);
 
         if (empty($items)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
-        return view($this->parentView . '.edit')->with('item', $items);
+        return view($this->parentView.'.edit')->with('item', $items);
     }
 
     /**
@@ -112,10 +111,9 @@ class IncomeExpenseTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
-            'name' => 'sometimes|string|unique:income_expense_types,name,' . $id,
-            'code' => 'sometimes|string|unique:income_expense_types,code,' . $id,
+            'name' => 'sometimes|string|unique:income_expense_types,name,'.$id,
+            'code' => 'sometimes|string|unique:income_expense_types,code,'.$id,
         ]);
 
         $items = $this->parentModel::find($id);
@@ -125,35 +123,33 @@ class IncomeExpenseTypeController extends Controller
 
         $items->updated_by = \Auth::user()->email;
 
-
         $items->save();
-        Session::flash('success', "Update Successfully");
-        return redirect()->route($this->parentRoute);
+        Session::flash('success', 'Update Successfully');
 
+        return redirect()->route($this->parentRoute);
     }
 
     public function pdf(Request $request)
     {
-
         $item = $this->parentModel::find($request->id);
         if (empty($item)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
         $now = new \DateTime();
         $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
-            'module_name' => 'Ledger Type'
-        );
+            'module_name' => 'Ledger Type',
+        ];
 
-        $pdf = PDF::loadView($this->parentView . '.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView($this->parentView.'.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
         //return $pdf->stream('invoice.pdf');
-        return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -163,33 +159,33 @@ class IncomeExpenseTypeController extends Controller
      */
     public function destroy($id)
     {
-
         $items = $this->parentModel::find($id);
         if (empty($items)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
         if (count(IncomeExpenseType::find($id)->IncomeExpenseHeads) > 0) {  // Child has or not
-            Session::flash('error', "You can not delete it.Because it has ledger items");
+            Session::flash('error', 'You can not delete it.Because it has ledger items');
+
             return redirect()->back();
         }
 
         $items->delete_by = \Auth::user()->email;
 
         $items->delete();
-        Session::flash('success', "Successfully Trashed");
+        Session::flash('success', 'Successfully Trashed');
+
         return redirect()->back();
     }
 
-
     public function trashed()
     {
-
         $items = $this->parentModel::onlyTrashed()->paginate(60);
-        return view($this->parentView . '.trashed')->with("items", $items);
-    }
 
+        return view($this->parentView.'.trashed')->with('items', $items);
+    }
 
     public function restore($id)
     {
@@ -197,6 +193,7 @@ class IncomeExpenseTypeController extends Controller
 
         $items->restore();
         Session::flash('success', 'Successfully Restore');
+
         return redirect()->back();
     }
 
@@ -204,112 +201,99 @@ class IncomeExpenseTypeController extends Controller
     {
         $items = $this->parentModel::withTrashed()->where('id', $id)->first();
 
-
         if (count(IncomeExpenseType::withTrashed()->find($id)->IncomeExpenseHeads) > 0) {  // Child has or not
-            Session::flash('error', "You can not delete it.Because it has ledger items");
+            Session::flash('error', 'You can not delete it.Because it has ledger items');
+
             return redirect()->back();
         }
 
         $items->forceDelete();
 
         Session::flash('success', 'Permanently Delete');
+
         return redirect()->back();
     }
 
     public function activeSearch(Request $request)
     {
-
         $request->validate([
-            'search' => 'min:1'
+            'search' => 'min:1',
         ]);
 
-        $search = $request["search"];
-        $items = $this->parentModel::where('name', 'like', '%' . $search . '%')
-            ->orWhere('code', 'like', '%' . $search . '%')
+        $search = $request['search'];
+        $items = $this->parentModel::where('name', 'like', '%'.$search.'%')
+            ->orWhere('code', 'like', '%'.$search.'%')
             ->paginate(60);
 
-        return view($this->parentView . '.index')
+        return view($this->parentView.'.index')
             ->with('items', $items);
-
     }
 
     public function trashedSearch(Request $request)
     {
-
         $request->validate([
-            'search' => 'min:1'
+            'search' => 'min:1',
         ]);
 
-
-        $search = $request["search"];
-        $items = $this->parentModel::where('name', 'like', '%' . $search . '%')
+        $search = $request['search'];
+        $items = $this->parentModel::where('name', 'like', '%'.$search.'%')
             ->onlyTrashed()
-            ->orWhere('code', 'like', '%' . $search . '%')
+            ->orWhere('code', 'like', '%'.$search.'%')
             ->onlyTrashed()
             ->paginate(60);
 
-        return view($this->parentView . '.trashed')
+        return view($this->parentView.'.trashed')
             ->with('items', $items);
-
     }
-
 
 //    Fixed Method for all
     public function activeAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 3 || $request->apply_comand_bottom == 3) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->destroy($id);
             }
 
             return redirect()->back();
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
-
     }
 
     public function trashedAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 1 || $request->apply_comand_bottom == 1) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->restore($id);
             }
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
-
+            foreach ($request->items['id'] as $id) {
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
+
         return redirect()->back();
     }
-
-
 }

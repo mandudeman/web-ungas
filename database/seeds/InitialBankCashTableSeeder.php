@@ -4,8 +4,6 @@ use Illuminate\Database\Seeder;
 
 class InitialBankCashTableSeeder extends Seeder
 {
-
-
     protected $voucher_type = 'IBCBV';
 
     /**
@@ -64,7 +62,5 @@ class InitialBankCashTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
 
         ]);
-
-
     }
 }

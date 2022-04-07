@@ -11,7 +11,6 @@ class ContraVoucherTableSeeder extends Seeder
      */
     public function run()
     {
-
         App\Transaction::create([
             'voucher_no' => '1',
             'branch_id'=>'1',
@@ -33,7 +32,6 @@ class ContraVoucherTableSeeder extends Seeder
             'particulars'=>'Contra Voucher by System',
             'created_by'=>'E-Accounts System',
         ]);
-
 
         App\Transaction::create([
             'voucher_no' => '2',
@@ -57,7 +55,6 @@ class ContraVoucherTableSeeder extends Seeder
             'created_by'=>'E-Accounts System',
         ]);
 
-
         App\Transaction::create([
             'voucher_no' => '3',
             'branch_id'=>'2',
@@ -79,8 +76,5 @@ class ContraVoucherTableSeeder extends Seeder
             'particulars'=>'Contra Voucher by System',
             'created_by'=>'E-Accounts System',
         ]);
-
-
-
     }
 }
