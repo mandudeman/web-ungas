@@ -14,7 +14,7 @@ $breadcrumbCurrentName = " Trashed";
 $breadcrumbMainIcon = "fas fa-project-diagram";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Branch';
+$ModelName = \App\Branch::class;
 $ParentRouteName = 'branch';
 
 

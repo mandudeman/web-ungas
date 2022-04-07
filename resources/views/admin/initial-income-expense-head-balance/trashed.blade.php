@@ -14,7 +14,7 @@ $breadcrumbCurrentName = " Trashed";
 $breadcrumbMainIcon = "fas fa-balance-scale";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Transaction';
+$ModelName = \App\Transaction::class;
 $ParentRouteName = 'initial_income_expense_head_balance';
 
 $voucher_type = "IIEHBV";

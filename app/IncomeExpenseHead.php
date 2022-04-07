@@ -27,16 +27,16 @@ class IncomeExpenseHead extends Model
 
     public function IncomeExpenseType()
     {
-        return $this->belongsTo('App\IncomeExpenseType', 'income_expense_type_id');
+        return $this->belongsTo(\App\IncomeExpenseType::class, 'income_expense_type_id');
     }
 
     public function IncomeExpenseGroup()
     {
-        return $this->belongsTo('App\IncomeExpenseGroup', 'income_expense_group_id');
+        return $this->belongsTo(\App\IncomeExpenseGroup::class, 'income_expense_group_id');
     }
 
     public function Transaction()
     {
-        return $this->hasMany('App\Transaction', 'income_expense_head_id');
+        return $this->hasMany(\App\Transaction::class, 'income_expense_head_id');
     }
 }

@@ -14,7 +14,7 @@ $breadcrumbMainIcon = "fas fa-handshake";
 $breadcrumbCurrentIcon = "archive";
 
 
-$ModelName = 'App\RoleManage';
+$ModelName = \App\RoleManage::class;
 
 $ParentRouteName = 'role-manage';
 

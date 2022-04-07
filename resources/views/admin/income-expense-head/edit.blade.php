@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " Edit";
 $breadcrumbMainIcon = "fas fa-file-invoice-dollar";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\IncomeExpenseHead';
+$ModelName = \App\IncomeExpenseHead::class;
 $ParentRouteName = 'income_expense_head';
 
 

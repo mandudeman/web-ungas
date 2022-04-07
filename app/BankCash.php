@@ -25,6 +25,6 @@ class BankCash extends Model
 
     public function Transactions()
     {
-        return $this->hasMany('App\Transaction', 'bank_cash_id');
+        return $this->hasMany(\App\Transaction::class, 'bank_cash_id');
     }
 }
