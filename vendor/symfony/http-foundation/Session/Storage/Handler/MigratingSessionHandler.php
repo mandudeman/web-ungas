@@ -42,7 +42,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         $result = $this->currentHandler->close();
         $this->writeOnlyHandler->close();
@@ -54,7 +54,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         $result = $this->currentHandler->destroy($sessionId);
         $this->writeOnlyHandler->destroy($sessionId);
@@ -66,7 +66,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return int|false
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc($maxlifetime): int
     {
         $result = $this->currentHandler->gc($maxlifetime);
         $this->writeOnlyHandler->gc($maxlifetime);
@@ -78,7 +78,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         $result = $this->currentHandler->open($savePath, $sessionName);
         $this->writeOnlyHandler->open($savePath, $sessionName);
@@ -90,7 +90,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return string
      */
     #[\ReturnTypeWillChange]
-    public function read($sessionId)
+    public function read($sessionId): string|false
     {
         // No reading from new handler until switch-over
         return $this->currentHandler->read($sessionId);
@@ -100,7 +100,7 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $sessionData): bool
     {
         $result = $this->currentHandler->write($sessionId, $sessionData);
         $this->writeOnlyHandler->write($sessionId, $sessionData);

@@ -39,7 +39,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName): bool
     {
         return $this->handler->open($savePath, $sessionName);
     }
@@ -48,7 +48,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return $this->handler->close();
     }
@@ -57,7 +57,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return string|false
      */
     #[\ReturnTypeWillChange]
-    public function read($sessionId)
+    public function read($sessionId): string|false
     {
         return $this->handler->read($sessionId);
     }
@@ -66,7 +66,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         return $this->handler->write($sessionId, $data);
     }
@@ -75,7 +75,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function destroy($sessionId)
+    public function destroy($sessionId): bool
     {
         return $this->handler->destroy($sessionId);
     }
@@ -84,7 +84,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * @return int|false
      */
     #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc($maxlifetime): int
     {
         return $this->handler->gc($maxlifetime);
     }
