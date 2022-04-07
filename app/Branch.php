@@ -11,7 +11,6 @@ class Branch extends Model
     use Notifiable;
     use SoftDeletes;
 
-
     protected $fillable = [
         'name',
         'location',

@@ -11,7 +11,6 @@ class IncomeExpenseHead extends Model
     use Notifiable;
     use SoftDeletes;
 
-
     protected $fillable = [
         'name',
         'unit',
