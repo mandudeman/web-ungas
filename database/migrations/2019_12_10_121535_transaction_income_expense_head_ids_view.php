@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class TransactionIncomeExpenseHeadIdsView extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -35,4 +35,4 @@ ORDER BY income_expense_head_id ASC');
     {
         DB::statement('DROP VIEW transaction_income_expense_head_Ids_view');
     }
-}
+};

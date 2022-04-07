@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class TransactionBankCashView extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -33,4 +33,4 @@ SELECT DISTINCT transactions.bank_cash_id, bank_cashes.name
     {
         DB::statement('DROP VIEW transaction_bank_cash_view');
     }
-}
+};
