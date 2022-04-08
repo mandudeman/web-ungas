@@ -59,8 +59,5 @@ class DrVoucherTableSeeder extends Seeder
             'particulars'=>'Dr by System',
             'created_by'=>'E-Accounts System',
         ]);
-
-
-
     }
 }

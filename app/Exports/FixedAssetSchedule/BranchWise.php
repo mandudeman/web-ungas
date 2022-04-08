@@ -2,27 +2,26 @@
 
 namespace App\Exports\FixedAssetSchedule;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromView;
 
 class BranchWise implements FromView
 {
-
     protected $particulars;
+
     protected $extra;
+
     protected $search_by;
+
     protected $roles;
 
     public function __construct($branch_wise)
     {
-        $this->particulars=$branch_wise['particulars'];
-        $this->extra=$branch_wise['extra'];
-        $this->search_by=$branch_wise['search_by'];
-
+        $this->particulars = $branch_wise['particulars'];
+        $this->extra = $branch_wise['extra'];
+        $this->search_by = $branch_wise['search_by'];
     }
-
 
     public function view(): View
     {
@@ -32,7 +31,4 @@ class BranchWise implements FromView
             'search_by' => $this->search_by,
         ]);
     }
-
-
-
 }

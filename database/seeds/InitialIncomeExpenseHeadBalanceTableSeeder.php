@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class InitialIncomeExpenseHeadBalanceTableSeeder extends Seeder
 {
-
     protected $voucher_type = 'IIEHBV';
 
     /**
@@ -70,6 +69,5 @@ class InitialIncomeExpenseHeadBalanceTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
 
         ]);
-
     }
 }

@@ -2,29 +2,25 @@
 
 namespace App\Http\Controllers;
 
-
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Controllers\RoleManageController;
 use App\Setting;
 use App\Transaction;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class InitialBankCashBalanceController extends Controller
 {
-
-
 //    Important properties
     public $parentModel = Transaction::class;
+
     public $parentRoute = 'initial_bank_cash_balance';
-    public $parentView = "admin.initial-bank-cash-balance";
 
+    public $parentView = 'admin.initial-bank-cash-balance';
 
-    public $voucher_type = "IBCBV";
-
+    public $voucher_type = 'IBCBV';
 
     /**
      * Display a listing of the resource.
@@ -33,9 +29,9 @@ class InitialBankCashBalanceController extends Controller
      */
     public function index()
     {
-
         $items = $this->parentModel::where('voucher_type', $this->voucher_type)->orderBy('id', 'desc')->paginate(60);
-        return view($this->parentView . '.index')->with('items', $items);
+
+        return view($this->parentView.'.index')->with('items', $items);
     }
 
     /**
@@ -45,7 +41,7 @@ class InitialBankCashBalanceController extends Controller
      */
     public function create()
     {
-        return view($this->parentView . '.create');
+        return view($this->parentView.'.create');
     }
 
     /**
@@ -72,7 +68,8 @@ class InitialBankCashBalanceController extends Controller
             ->get();
 
         if (count($initial_exist_or_not) > 0) {
-            Session::flash('error', "This Branch, Bank Cash Initial Balance already exit. Try another one");
+            Session::flash('error', 'This Branch, Bank Cash Initial Balance already exit. Try another one');
+
             return redirect()->back();
         }
 
@@ -85,7 +82,7 @@ class InitialBankCashBalanceController extends Controller
             ->get()
             ->first();
 
-        if (!empty($voucher_info)) {
+        if (! empty($voucher_info)) {
             $voucher_no = $voucher_info->voucher_no + 1;
         } else {
             $voucher_no = 1;
@@ -104,9 +101,9 @@ class InitialBankCashBalanceController extends Controller
             'created_by' => \Auth::user()->email,
 
         ]);
-        Session::flash('success', "Successfully  Create");
-        return redirect()->back();
+        Session::flash('success', 'Successfully  Create');
 
+        return redirect()->back();
     }
 
     /**
@@ -127,11 +124,12 @@ class InitialBankCashBalanceController extends Controller
             ->get();
 
         if (count($item) < 1) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
-        return view($this->parentView . '.show')->with('items', $item);
 
+        return view($this->parentView.'.show')->with('items', $item);
     }
 
     /**
@@ -142,7 +140,6 @@ class InitialBankCashBalanceController extends Controller
      */
     public function edit($id)
     {
-
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
                 $q->where('voucher_no', '=', $id);
@@ -150,15 +147,15 @@ class InitialBankCashBalanceController extends Controller
             ->get()->first();
 
         if (empty($items)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
         $date = new \DateTime($items->voucher_date);
         $voucher_date = $date->format('m/d/Y'); // 31-07-2012 '2008-11-11'
 
-
-        return view($this->parentView . '.edit')->with('item', $items);
+        return view($this->parentView.'.edit')->with('item', $items);
     }
 
     /**
@@ -170,7 +167,6 @@ class InitialBankCashBalanceController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
             'branch_id' => 'required|numeric|min:1',
             'bank_cash_id' => 'required|numeric|min:1',
@@ -187,7 +183,7 @@ class InitialBankCashBalanceController extends Controller
             })
             ->get()->first();
 
-        if (!(($request->branch_id == $items->branch_id) and ($request->bank_cash_id == $items->bank_cash_id))) {
+        if (! (($request->branch_id == $items->branch_id) and ($request->bank_cash_id == $items->bank_cash_id))) {
             $initial_exist_or_not = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
                 ->withTrashed()
                 ->where('branch_id', '=', $request->branch_id)
@@ -195,7 +191,8 @@ class InitialBankCashBalanceController extends Controller
                 ->withTrashed()
                 ->get();
             if (count($initial_exist_or_not) > 0) {
-                Session::flash('error', "This Branch, Bank Cash Initial Balance already exit. Try another one");
+                Session::flash('error', 'This Branch, Bank Cash Initial Balance already exit. Try another one');
+
                 return redirect()->back();
             }
         }
@@ -209,18 +206,16 @@ class InitialBankCashBalanceController extends Controller
         $items->voucher_date = $voucher_date;
         $items->particulars = $request->particulars;
 
-
         $items->updated_by = \Auth::user()->email;
 
         $items->save();
-        Session::flash('success', "Update Successfully");
-        return redirect()->route($this->parentRoute);
+        Session::flash('success', 'Update Successfully');
 
+        return redirect()->route($this->parentRoute);
     }
 
     public function pdf(Request $request)
     {
-
         $id = $request->id;
         $item = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
@@ -229,31 +224,28 @@ class InitialBankCashBalanceController extends Controller
             ->get();
 
         if (count($item) == 0) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->route($this->parentRoute);
         }
 
-
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Initial Bank Cash Balance Report',
-            'voucher_type' => 'INITIAL BANK CASH BALANCE'
-        );
-
+            'voucher_type' => 'INITIAL BANK CASH BALANCE',
+        ];
 
         // return view('admin.dr-voucher.pdf');
 
-        $pdf = PDF::loadView($this->parentView . '.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView($this->parentView.'.pdf', ['items' => $item, 'extra' => $extra])->setPaper('a4', 'landscape');
 
-       // return $pdf->stream($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        // return $pdf->stream($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
 
-        return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
+        return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -263,7 +255,6 @@ class InitialBankCashBalanceController extends Controller
      */
     public function destroy($id)
     {
-
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($id) {
                 $q->where('voucher_no', '=', $id);
@@ -271,7 +262,8 @@ class InitialBankCashBalanceController extends Controller
             ->get()->first();
 
         if (empty($items)) {
-            Session::flash('error', "Item not found");
+            Session::flash('error', 'Item not found');
+
             return redirect()->back();
         }
 
@@ -279,18 +271,17 @@ class InitialBankCashBalanceController extends Controller
         $items->save();
 
         $items->delete();
-        Session::flash('success', "Successfully Trashed");
+        Session::flash('success', 'Successfully Trashed');
+
         return redirect()->back();
     }
 
-
     public function trashed()
     {
-
         $items = $this->parentModel::onlyTrashed()->where('voucher_type', $this->voucher_type)->orderBy('id', 'desc')->paginate(60);
-        return view($this->parentView . '.trashed')->with("items", $items);
-    }
 
+        return view($this->parentView.'.trashed')->with('items', $items);
+    }
 
     public function restore($id)
     {
@@ -304,19 +295,18 @@ class InitialBankCashBalanceController extends Controller
             ->onlyTrashed()
             ->get()->first();
 
-
         $items->restore();
 
         $items->updated_by = \Auth::user()->email;
         $items->save();
 
         Session::flash('success', 'Successfully Restore');
+
         return redirect()->back();
     }
 
     public function kill($id)
     {
-
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->withTrashed()
             ->where(function ($q) use ($id) {
@@ -325,136 +315,121 @@ class InitialBankCashBalanceController extends Controller
             ->withTrashed()
             ->get()->first();
 
-
         $items->forceDelete();
 
         Session::flash('success', 'Permanently Delete');
+
         return redirect()->back();
     }
 
     public function activeSearch(Request $request)
     {
-
         $request->validate([
-            'search' => 'min:1'
+            'search' => 'min:1',
         ]);
 
-        $search = $request["search"];
+        $search = $request['search'];
 
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('cheque_number', '=', $search)
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->paginate(60);
 
-
-        return view($this->parentView . '.index')
+        return view($this->parentView.'.index')
             ->with('items', $items);
-
     }
 
     public function trashedSearch(Request $request)
     {
-
         $request->validate([
-            'search' => 'min:1'
+            'search' => 'min:1',
         ]);
 
-        $search = $request["search"];
+        $search = $request['search'];
 
         $items = $this->parentModel::where('voucher_type', '=', $this->voucher_type)
             ->onlyTrashed()
             ->where(function ($q) use ($search) {
                 $q->where('voucher_no', '=', $search)
-                    ->orWhere('voucher_date', 'like', date("Y-m-d", strtotime($search)))
+                    ->orWhere('voucher_date', 'like', date('Y-m-d', strtotime($search)))
                     ->orWhere('cheque_number', '=', $search)
                     ->orWhere('dr', '=', $search)
                     ->orWhere('cr', '=', $search)
-                    ->orWhere('particulars', 'like', '%' . $search . '%')
+                    ->orWhere('particulars', 'like', '%'.$search.'%')
                     ->orWhereHas('BankCash', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('Branch', function ($query) use ($search) {
-                        $query->where('name', 'like', '%' . $search . '%');
+                        $query->where('name', 'like', '%'.$search.'%');
                     });
             })
             ->onlyTrashed()
             ->paginate(60);
 
-
-        return view($this->parentView . '.trashed')
+        return view($this->parentView.'.trashed')
             ->with('items', $items);
-
     }
-
 
 //    Fixed Method for all
     public function activeAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 3 || $request->apply_comand_bottom == 3) {
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->destroy($id);
             }
 
             return redirect()->back();
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
-
     }
 
     public function trashedAction(Request $request)
     {
-
         $request->validate([
-            'items' => 'required'
+            'items' => 'required',
         ]);
 
         if ($request->apply_comand_top == 1 || $request->apply_comand_bottom == 1) {
-
-            foreach ($request->items["id"] as $id) {
+            foreach ($request->items['id'] as $id) {
                 $this->restore($id);
             }
-
         } elseif ($request->apply_comand_top == 2 || $request->apply_comand_bottom == 2) {
-
-            foreach ($request->items["id"] as $id) {
-
+            foreach ($request->items['id'] as $id) {
                 $this->kill($id);
             }
-            return redirect()->back();
 
+            return redirect()->back();
         } else {
-            Session::flash('error', "Something is wrong.Try again");
+            Session::flash('error', 'Something is wrong.Try again');
+
             return redirect()->back();
         }
+
         return redirect()->back();
     }
-
-
 }

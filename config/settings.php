@@ -36,7 +36,6 @@ return [
     'zip_code' => '1229',
     'company_logo' => 'upload/company-logo/e.png',
 
-
     /*
     |--------------------------------------------------------------------------
     |  System Settings Manage

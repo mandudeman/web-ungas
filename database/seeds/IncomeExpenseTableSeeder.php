@@ -108,7 +108,6 @@ class IncomeExpenseTableSeeder extends Seeder
             'created_by' => 'E-Accounts system',
         ]);
 
-
         App\IncomeExpenseType::create([
             'name' => 'Advance Receive from Investor',
             'code' => '120',
@@ -124,8 +123,5 @@ class IncomeExpenseTableSeeder extends Seeder
             'code' => '122',
             'created_by' => 'E-Accounts system',
         ]);
-
-
-
     }
 }

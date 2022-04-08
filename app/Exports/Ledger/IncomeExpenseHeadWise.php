@@ -2,26 +2,24 @@
 
 namespace App\Exports\Ledger;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromView;
 
 class IncomeExpenseHeadWise implements FromView
 {
-
     protected $items;
-    protected $extra;
-    protected $transaction_income_expense_head_ids_names;
 
+    protected $extra;
+
+    protected $transaction_income_expense_head_ids_names;
 
     public function __construct($branch_wise_ledger)
     {
-        $this->items=$branch_wise_ledger['items'];
-        $this->extra=$branch_wise_ledger['extra'];
-        $this->transaction_income_expense_head_ids_names=$branch_wise_ledger['transaction_income_expense_head_ids_names'];
+        $this->items = $branch_wise_ledger['items'];
+        $this->extra = $branch_wise_ledger['extra'];
+        $this->transaction_income_expense_head_ids_names = $branch_wise_ledger['transaction_income_expense_head_ids_names'];
     }
-
 
     public function view(): View
     {

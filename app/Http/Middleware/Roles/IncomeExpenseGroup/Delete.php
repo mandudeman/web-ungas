@@ -20,6 +20,7 @@ class Delete
             return $next($request);
         } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

@@ -2,26 +2,22 @@
 
 namespace App\Http\Controllers\Reports\Accounts;
 
-use App\Exports\FixedAssetSchedule\BranchWise;
-use App\Http\Controllers\TransactionController;
-use App\IncomeExpenseType;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-
-
-use App\Branch;
-use App\IncomeExpenseHead;
 use App\BankCash;
+use App\Branch;
+use App\Exports\FixedAssetSchedule\BranchWise;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\RoleManageController;
+use App\Http\Controllers\TransactionController;
+use App\IncomeExpenseHead;
+use App\IncomeExpenseType;
+use App\Setting;
 use App\Transaction;
-
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
-use Barryvdh\DomPDF\Facade as PDF;
-use App\Http\Controllers\RoleManageController;
-use App\Setting;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class FixedAssetScheduleController extends Controller
 {
@@ -29,7 +25,6 @@ class FixedAssetScheduleController extends Controller
     {
         return view('admin.accounts-report.fixed-asset-schedule.index');
     }
-
 
     public function branch_wise(Request $request)
     {
@@ -39,13 +34,13 @@ class FixedAssetScheduleController extends Controller
         ]);
 
         $now = new \DateTime();
-        $date = $now->format(Config('settings.date_format') . ' h:i:s');
+        $date = $now->format(Config('settings.date_format').' h:i:s');
 
-        $extra = array(
+        $extra = [
             'current_date_time' => $date,
             'module_name' => 'Fixed Assets Schedule Branch Wise Report',
-            'voucher_type' => 'FIXED ASSETS SCHEDULE'
-        );
+            'voucher_type' => 'FIXED ASSETS SCHEDULE',
+        ];
 
         // Common items
 
@@ -58,27 +53,25 @@ class FixedAssetScheduleController extends Controller
         $from = date(config('settings.date_format'), strtotime($request->from));
         $to = date(config('settings.date_format'), strtotime($request->to));
 
-        $search_by = array(
+        $search_by = [
             'branch_name' => $branch_name,
             'branch_id' => $request->branch_id,
             'from' => $from,
             'to' => $to,
-        );
+        ];
 
         $FixedAssetSchedule = $this->getFixedAssetSchedule($request->branch_id, $from, $to);
-
 
         // Show Action
         if ($request->action == 'Show') {
             return view('admin.accounts-report.fixed-asset-schedule.branch-wise.index')
-                ->with('particulars', $FixedAssetSchedule )
+                ->with('particulars', $FixedAssetSchedule)
                 ->with('extra', $extra)
                 ->with('search_by', $search_by);
         }
 
         // Pdf Action
         if ($request->action == 'Pdf') {
-
             $pdf = PDF::loadView('admin.accounts-report.fixed-asset-schedule.branch-wise.pdf', [
                 'particulars' => $FixedAssetSchedule,
                 'extra' => $extra,
@@ -87,25 +80,21 @@ class FixedAssetScheduleController extends Controller
                 ->setPaper('a4', 'landscape');
 
             //return $pdf->stream(date(config('settings.date_format'), strtotime($extra['current_date_time'])) . '_' . $extra['module_name'] . '.pdf');
-            return $pdf->download($extra['current_date_time'] . '_' . $extra['module_name'] . '.pdf');
-
+            return $pdf->download($extra['current_date_time'].'_'.$extra['module_name'].'.pdf');
         }
 
         // Excel Action
         if ($request->action == 'Excel') {
-
             $BranchWise = new BranchWise([
                 'particulars' => $FixedAssetSchedule,
                 'extra' => $extra,
                 'search_by' => $search_by,
 
             ]);
-            return Excel::download($BranchWise, $extra['current_date_time'] . '_' . $extra['module_name'] . '.xlsx');
 
+            return Excel::download($BranchWise, $extra['current_date_time'].'_'.$extra['module_name'].'.xlsx');
         }
-
     }
-
 
     public function getFixedAssetSchedule($Branch_id, $from, $to)
     {
@@ -119,19 +108,14 @@ class FixedAssetScheduleController extends Controller
         $TransactionsController = new TransactionController();
         $uniqueBranches = $TransactionsController->getUniqueBranches($Branch_id);
 
-        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', array(119))
+        $CostOfRevenueHeadTypes = IncomeExpenseType::whereIn('code', [119])
             ->orderBy('code', 'asc')
             ->get();
-
 
         foreach ($CostOfRevenueHeadTypes as $costOfRevenueHeadType) {
             $FixedAssetDetails[$costOfRevenueHeadType->code] = $TransactionsModel->getBalanceByIncExpHeadTypeIdBranchesTwoDate($costOfRevenueHeadType->id, $uniqueBranches, $FixedAssetScheduleStartingDate, $from, $FixedAssetScheduleStartingDate, $to);
         }
 
         return $FixedAssetDetails[119]['headDetails'];
-
-
     }
-
-
 }

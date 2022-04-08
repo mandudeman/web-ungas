@@ -6,7 +6,6 @@
  * Time: 5:06 PM
  */
 
-
 return [
 
     /*
@@ -171,7 +170,6 @@ return [
         'TrashShow' => 1,
     ],
 
-
     'Ledger' => [
         'All' => 1,
         'Create' => 1,
@@ -327,9 +325,4 @@ return [
         'TrashShow' => 1,
     ],
 
-
-
-
-
 ];
-

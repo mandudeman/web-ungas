@@ -53,8 +53,6 @@ class JournalVoucherTableSeeder extends Seeder
             'created_by'=>'E-Accounts System',
         ]);
 
-
-
         App\Transaction::create([
             'voucher_no' => '2',
             'branch_id'=>'1',
@@ -76,10 +74,7 @@ class JournalVoucherTableSeeder extends Seeder
             'created_by'=>'E-Accounts System',
         ]);
 
-
-
-
-         App\Transaction::create([
+        App\Transaction::create([
             'voucher_no' => '3',
             'branch_id'=>'1',
             'income_expense_head_id'=>'2',
@@ -109,9 +104,6 @@ class JournalVoucherTableSeeder extends Seeder
             'particulars'=>'Journal Voucher by System',
             'created_by'=>'E-Accounts System',
         ]);
-
-
-
 
         App\Transaction::create([
             'voucher_no' => '4',
@@ -144,7 +136,5 @@ class JournalVoucherTableSeeder extends Seeder
             'particulars'=>'Journal Voucher by System',
             'created_by'=>'E-Accounts System',
         ]);
-
-
     }
 }

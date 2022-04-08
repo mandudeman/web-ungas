@@ -13,12 +13,12 @@ class BankCashTableSeeder extends Seeder
     {
         App\BankCash::create([
             'name' => 'Cash',
-            'description' => 'This is Cash of our company'
+            'description' => 'This is Cash of our company',
         ]);
         App\BankCash::create([
             'name' => 'DBBL',
             'account_number' => '199457441',
-            'description' => 'Dutch Bangla Bank Limited'
+            'description' => 'Dutch Bangla Bank Limited',
         ]);
         App\BankCash::create([
             'name' => 'HSBC',
@@ -36,7 +36,5 @@ class BankCashTableSeeder extends Seeder
             'name' => 'Jomuna Bank',
             'account_number' => '19945454154215',
         ]);
-
-
     }
 }
