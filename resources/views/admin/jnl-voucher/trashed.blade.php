@@ -14,7 +14,7 @@ $breadcrumbCurrentName = " Trashed";
 $breadcrumbMainIcon = "account_balance_wallet";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Transaction';
+$ModelName = \App\Transaction::class;
 $ParentRouteName = 'jnl_voucher';
 
 $voucher_type = 'JV';

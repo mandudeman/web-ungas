@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " All";
 $breadcrumbMainIcon = "fas fa-university";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\BankCash';
+$ModelName = \App\BankCash::class;
 $ParentRouteName = 'bank_cash';
 
 

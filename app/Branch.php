@@ -25,6 +25,6 @@ class Branch extends Model
 
     public function Transaction()
     {
-        return $this->hasMany('App\Transaction', 'branch_id');
+        return $this->hasMany(\App\Transaction::class, 'branch_id');
     }
 }

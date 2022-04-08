@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " Update";
 $breadcrumbMainIcon = "fas fa-project-diagram";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Setting';
+$ModelName = \App\Setting::class;
 $ParentRouteName = 'settings.general';
 
 

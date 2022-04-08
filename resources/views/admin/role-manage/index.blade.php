@@ -14,7 +14,7 @@ $breadcrumbCurrentName = " All";
 $breadcrumbMainIcon = "fas fa-user-lock";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\RoleManage';
+$ModelName = \App\RoleManage::class;
 $ParentRouteName = 'role-manage';
 
 
