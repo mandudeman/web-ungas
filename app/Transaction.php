@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\IncomeExpenseHead;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Session;
 
 class Transaction extends Model
 {
+    use HasFactory;
+
     use Notifiable;
     use SoftDeletes;
 
