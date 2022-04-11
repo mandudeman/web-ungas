@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " Show";
 $breadcrumbMainIcon = "account_balance_wallet";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Transaction';
+$ModelName = \App\Transaction::class;
 $ParentRouteName = 'dr_voucher';
 
 

@@ -162,7 +162,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
         ]);
 
-
         App\IncomeExpenseHead::create([
             'name' => 'Donation',
             'income_expense_type_id' => '6',
@@ -238,7 +237,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
         ]);
 
-
         App\IncomeExpenseHead::create([
             'name' => 'Gilbert',
             'income_expense_type_id' => '8',
@@ -272,7 +270,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
 
             'created_by' => 'E-Accounts System',
         ]);
-
 
         App\IncomeExpenseHead::create([
             'name' => 'Loan From Ricardo',
@@ -308,7 +305,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
 
             'created_by' => 'E-Accounts System',
         ]);
-
 
         App\IncomeExpenseHead::create([
             'name' => 'Govt Approval (Land Use permission)',
@@ -358,7 +354,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
 
             'created_by' => 'E-Accounts System',
         ]);
-
 
         App\IncomeExpenseHead::create([
             'name' => 'Cylinder Test',
@@ -443,7 +438,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
         ]);
 
-
         App\IncomeExpenseHead::create([
             'name' => 'Air Condition',
             'income_expense_type_id' => '19',
@@ -478,7 +472,6 @@ class IncomeExpenseHeadTableSeeder extends Seeder
             'created_by' => 'E-Accounts System',
         ]);
 
-
         App\IncomeExpenseHead::create([
             'name' => 'Preliminary Expense',
             'income_expense_type_id' => '21',
@@ -496,11 +489,5 @@ class IncomeExpenseHeadTableSeeder extends Seeder
 
             'created_by' => 'E-Accounts System',
         ]);
-
-
-
-
-
-
     }
 }

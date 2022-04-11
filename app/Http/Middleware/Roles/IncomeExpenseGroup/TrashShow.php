@@ -16,10 +16,11 @@ class TrashShow
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.LedgerGroup.TrashShow')){ // Trash Show
+        if (config('role_manage.LedgerGroup.TrashShow')) { // Trash Show
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

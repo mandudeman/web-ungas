@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " Create";
 $breadcrumbMainIcon = "account_balance_wallet";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\Transaction';
+$ModelName = \App\Transaction::class;
 $ParentRouteName = 'cr_voucher';
 
 $all = config('role_manage.CrVoucher.All');

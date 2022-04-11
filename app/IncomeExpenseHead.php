@@ -3,14 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+
 class IncomeExpenseHead extends Model
 {
     use Notifiable;
     use SoftDeletes;
+
     protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'name',
         'unit',
@@ -20,24 +22,21 @@ class IncomeExpenseHead extends Model
 
         'created_by',
         'updated_by',
-        'deleted_by'
+        'deleted_by',
     ];
 
     public function IncomeExpenseType()
     {
-        return $this->belongsTo('App\IncomeExpenseType','income_expense_type_id');
+        return $this->belongsTo(\App\IncomeExpenseType::class, 'income_expense_type_id');
     }
 
     public function IncomeExpenseGroup()
     {
-        return $this->belongsTo('App\IncomeExpenseGroup','income_expense_group_id');
+        return $this->belongsTo(\App\IncomeExpenseGroup::class, 'income_expense_group_id');
     }
-
 
     public function Transaction()
     {
-        return $this->hasMany('App\Transaction','income_expense_head_id');
+        return $this->hasMany(\App\Transaction::class, 'income_expense_head_id');
     }
-
-
 }

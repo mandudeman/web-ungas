@@ -3,9 +3,7 @@
 namespace App;
 
 use App\IncomeExpenseHead;
-
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +13,9 @@ class Transaction extends Model
 {
     use Notifiable;
     use SoftDeletes;
+
     protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'voucher_no',
         'branch_id',
@@ -28,25 +28,24 @@ class Transaction extends Model
         'cr',
         'particulars',
 
-
         'created_by',
         'updated_by',
-        'deleted_by'
+        'deleted_by',
     ];
 
     public function Branch()
     {
-        return $this->belongsTo('App\Branch', 'branch_id');
+        return $this->belongsTo(\App\Branch::class, 'branch_id');
     }
 
     public function IncomeExpenseHead()
     {
-        return $this->belongsTo('App\IncomeExpenseHead', 'income_expense_head_id');
+        return $this->belongsTo(\App\IncomeExpenseHead::class, 'income_expense_head_id');
     }
 
     public function BankCash()
     {
-        return $this->belongsTo('App\BankCash', 'bank_cash_id');
+        return $this->belongsTo(\App\BankCash::class, 'bank_cash_id');
     }
 
     public function isDebitByIncomeExpenseHeadID($id)
@@ -54,45 +53,43 @@ class Transaction extends Model
         return IncomeExpenseHead::find($id)->type;
     }
 
-
     public function GetBankCashBalanceByBranchBankCashIdDate($branch_id, $bankCashID = null, $from_date = null, $to_date = null)
     {
-
         if ($branch_id > 0 and $bankCashID > 0 and $from_date != null) {
-            $condition = "bank_cash_id=" . $bankCashID . " 
-            AND branch_id=" . $branch_id . "
-            AND voucher_date BETWEEN '" . date("Y-m-d", strtotime($from_date)) . "' AND '" . date("Y-m-d", strtotime($to_date)) . "'
+            $condition = 'bank_cash_id='.$bankCashID.' 
+            AND branch_id='.$branch_id."
+            AND voucher_date BETWEEN '".date('Y-m-d', strtotime($from_date))."' AND '".date('Y-m-d', strtotime($to_date))."'
             ";
         }
 
         if ($branch_id > 0 and $bankCashID > 0 and $from_date == null) {
-            $condition = "bank_cash_id=" . $bankCashID . " 
-            AND branch_id=" . $branch_id . "
-            ";
+            $condition = 'bank_cash_id='.$bankCashID.' 
+            AND branch_id='.$branch_id.'
+            ';
         }
 
         if ($branch_id == 0 and $bankCashID > 0 and $from_date == null) {
-            $condition = "bank_cash_id=" . $bankCashID . "
-            ";
+            $condition = 'bank_cash_id='.$bankCashID.'
+            ';
         }
 
         if ($branch_id == 0 and $bankCashID > 0 and $from_date != null) {
-            $condition = "bank_cash_id=" . $bankCashID . "
-            AND voucher_date BETWEEN '" . date("Y-m-d", strtotime($from_date)) . "' AND '" . date("Y-m-d", strtotime($to_date)) . "'
+            $condition = 'bank_cash_id='.$bankCashID."
+            AND voucher_date BETWEEN '".date('Y-m-d', strtotime($from_date))."' AND '".date('Y-m-d', strtotime($to_date))."'
             ";
         }
 
-        $balance = DB::select(DB::raw("
+        $balance = DB::select(DB::raw('
                 SELECT IFNULL(SUM(transactions.cr) , 0 ) - IFNULL( SUM(transactions.dr), 0)  AS Balance
                 FROM
                 transactions
                 INNER JOIN bank_cashes
                 ON transactions.bank_cash_id=bank_cashes.id
-                WHERE " . $condition . "
+                WHERE '.$condition.'
                 
                 AND transactions.deleted_at IS NULL
                 
-            "));
+            '));
 
         return $balance[0]->Balance;
     }
@@ -100,49 +97,46 @@ class Transaction extends Model
     public function GetUniqueIncomeExpenseHeadByBranch($branchID, $from_date = null, $to_date = null)
     {
         if ($branchID > 0 and $from_date != null and $to_date != null) {
-            $condition = " branch_id=" . $branchID . "  AND transactions.voucher_date BETWEEN '" . $from_date . "' AND '" . $to_date . "' ";
+            $condition = ' branch_id='.$branchID."  AND transactions.voucher_date BETWEEN '".$from_date."' AND '".$to_date."' ";
         } elseif ($branchID > 0 and $from_date == null and $to_date == null) {
-            $condition = " branch_id=" . $branchID . " ";
+            $condition = ' branch_id='.$branchID.' ';
         } elseif ($branchID == 0 and $from_date != null and $to_date != null) {
-            $condition = " transactions.voucher_date BETWEEN '" . $from_date . "' AND '" . $to_date . "' ";
+            $condition = " transactions.voucher_date BETWEEN '".$from_date."' AND '".$to_date."' ";
         }
 
-
-        $incomeExpenseHeadDetails = DB::select(DB::raw("SELECT DISTINCT transactions.income_expense_head_id , 
+        $incomeExpenseHeadDetails = DB::select(DB::raw('SELECT DISTINCT transactions.income_expense_head_id , 
               income_expense_heads.name, income_expense_heads.`type`
               FROM 
               transactions
               INNER JOIN income_expense_heads
               ON transactions.income_expense_head_id=income_expense_heads.id
-              WHERE " . $condition . "
+              WHERE '.$condition.'
               AND transactions.deleted_at IS NULL
               AND income_expense_head_id IS NOT NULL
-              ORDER BY income_expense_head_id asc"));
-
+              ORDER BY income_expense_head_id asc'));
 
         return $incomeExpenseHeadDetails;
     }
 
-
     public function GetBalanceByBranchIdIncExpIdTypeId($branch_id, $head_id, $type_id, $from_date = null, $to_date = null)
     {
-        if (!empty($from_date)) {
-            $condition = "branch_id=" . $branch_id . " AND income_expense_head_id =" . $head_id . " AND type=" . $type_id . " 
-            AND voucher_date BETWEEN '" . date("Y-m-d", strtotime($from_date)) . "' AND '" . date("Y-m-d", strtotime($to_date)) . "' ";
+        if (! empty($from_date)) {
+            $condition = 'branch_id='.$branch_id.' AND income_expense_head_id ='.$head_id.' AND type='.$type_id." 
+            AND voucher_date BETWEEN '".date('Y-m-d', strtotime($from_date))."' AND '".date('Y-m-d', strtotime($to_date))."' ";
         } else {
-            $condition = " branch_id=" . $branch_id . " AND income_expense_head_id =" . $head_id . " AND type=" . $type_id . " ";
+            $condition = ' branch_id='.$branch_id.' AND income_expense_head_id ='.$head_id.' AND type='.$type_id.' ';
         }
 
-        $DrCrDetails = DB::select(DB::raw("
+        $DrCrDetails = DB::select(DB::raw('
              SELECT transactions.dr , transactions.cr 
              FROM 
              transactions 
              INNER JOIN income_expense_heads
              ON transactions.income_expense_head_id=income_expense_heads.id
-             WHERE " . $condition . "
+             WHERE '.$condition.'
              AND transactions.deleted_at IS NULL
             ;
-        "));
+        '));
 
         $balance = 0;
         foreach ($DrCrDetails as $crDetail) {
@@ -152,8 +146,8 @@ class Transaction extends Model
                 $balance += $crDetail->cr - $crDetail->dr;
             }
         }
-        return $balance;
 
+        return $balance;
     }
 
     public function convert_number_to_words($number)
@@ -163,7 +157,7 @@ class Transaction extends Model
         $separator = ', ';
         $negative = 'negative ';
         $decimal = ' point ';
-        $dictionary = array(
+        $dictionary = [
             0 => 'zero',
             1 => 'one',
             2 => 'two',
@@ -198,24 +192,25 @@ class Transaction extends Model
             1000000000 => 'billion',
             1000000000000 => 'trillion',
             1000000000000000 => 'quadrillion',
-            1000000000000000000 => 'quintillion'
-        );
+            1000000000000000000 => 'quintillion',
+        ];
 
-        if (!is_numeric($number)) {
+        if (! is_numeric($number)) {
             return false;
         }
 
-        if (($number >= 0 && (int)$number < 0) || (int)$number < 0 - PHP_INT_MAX) {
+        if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
             // overflow
             trigger_error(
-                'convert_number_to_words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
+                'convert_number_to_words only accepts numbers between -'.PHP_INT_MAX.' and '.PHP_INT_MAX,
                 E_USER_WARNING
             );
+
             return false;
         }
 
         if ($number < 0) {
-            return $negative . Self::convert_number_to_words(abs($number));
+            return $negative.self::convert_number_to_words(abs($number));
         }
 
         $string = $fraction = null;
@@ -229,37 +224,37 @@ class Transaction extends Model
                 $string = $dictionary[$number];
                 break;
             case $number < 100:
-                $tens = ((int)($number / 10)) * 10;
+                $tens = ((int) ($number / 10)) * 10;
                 $units = $number % 10;
                 $string = $dictionary[$tens];
                 if ($units) {
-                    $string .= $hyphen . $dictionary[$units];
+                    $string .= $hyphen.$dictionary[$units];
                 }
                 break;
             case $number < 1000:
                 $hundreds = $number / 100;
                 $remainder = $number % 100;
-                $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
+                $string = $dictionary[$hundreds].' '.$dictionary[100];
                 if ($remainder) {
-                    $string .= $conjunction . Self::convert_number_to_words($remainder);
+                    $string .= $conjunction.self::convert_number_to_words($remainder);
                 }
                 break;
             default:
                 $baseUnit = pow(1000, floor(log($number, 1000)));
-                $numBaseUnits = (int)($number / $baseUnit);
+                $numBaseUnits = (int) ($number / $baseUnit);
                 $remainder = $number % $baseUnit;
-                $string = Self::convert_number_to_words($numBaseUnits) . ' ' . $dictionary[$baseUnit];
+                $string = self::convert_number_to_words($numBaseUnits).' '.$dictionary[$baseUnit];
                 if ($remainder) {
                     $string .= $remainder < 100 ? $conjunction : $separator;
-                    $string .= Self::convert_number_to_words($remainder);
+                    $string .= self::convert_number_to_words($remainder);
                 }
                 break;
         }
 
         if (null !== $fraction && is_numeric($fraction)) {
             $string .= $decimal;
-            $words = array();
-            foreach (str_split((string)$fraction) as $number) {
+            $words = [];
+            foreach (str_split((string) $fraction) as $number) {
                 $words[] = $dictionary[$number];
             }
             $string .= implode(' ', $words);
@@ -279,17 +274,15 @@ class Transaction extends Model
 
         $start_balance = 0;
         $end_balance = 0;
-        $headBalanceStart = array();
-        $headBalanceEnd = array();
+        $headBalanceStart = [];
+        $headBalanceEnd = [];
         foreach ($transaction_unique_branches as $transaction_unique_branch) {
             foreach ($IncomeExpenseHeads as $incomeExpenseHead) {
-
                 $start_balance += $startBalance = $this->GetBalanceByBranchIdIncExpIdTypeId($transaction_unique_branch->branch_id, $incomeExpenseHead->id, $incomeExpenseHead->type, $start_from, $start_to);
                 $end_balance += $endBalance = $this->GetBalanceByBranchIdIncExpIdTypeId($transaction_unique_branch->branch_id, $incomeExpenseHead->id, $incomeExpenseHead->type, $end_from, $end_to);
 
                 if (array_key_exists($incomeExpenseHead->name, $headBalanceStart)) {
                     $headBalanceStart[$incomeExpenseHead->name] += $startBalance;
-
                 } else {
                     $headBalanceStart[$incomeExpenseHead->name] = $startBalance;
                 }
@@ -300,44 +293,41 @@ class Transaction extends Model
                     $headBalanceEnd[$incomeExpenseHead->name] = $endBalance;
                 }
             }
-
         }
 
-        $balance = array(
-            'balance' => array(
+        $balance = [
+            'balance' => [
                 'start_balance' => $start_balance,
-                'end_balance' => $end_balance
-            ),
-            'headDetails' => array(
+                'end_balance' => $end_balance,
+            ],
+            'headDetails' => [
                 'StartDate' => $headBalanceStart,
                 'EndDate' => $headBalanceEnd,
-                'TotalBalance' => array(
+                'TotalBalance' => [
                     'start_balance' => $start_balance,
-                    'end_balance' => $end_balance
-                ),
-            )
-        );
+                    'end_balance' => $end_balance,
+                ],
+            ],
+        ];
+
         return $balance;
     }
 
     public function getBalanceByIncExpHeadGroupIdBranchesTwoDate($IncomeExpenseGroupId, $transaction_unique_branches, $start_from, $start_to, $end_from, $end_to)
     {
-
         $IncomeExpenseHeads = IncomeExpenseGroup::find($IncomeExpenseGroupId)->IncomeExpenseHeads;
 
         $start_balance = 0;
         $end_balance = 0;
-        $headBalanceStart = array();
-        $headBalanceEnd = array();
+        $headBalanceStart = [];
+        $headBalanceEnd = [];
         foreach ($transaction_unique_branches as $transaction_unique_branch) {
             foreach ($IncomeExpenseHeads as $incomeExpenseHead) {
-
                 $start_balance += $startBalance = $this->GetBalanceByBranchIdIncExpIdTypeId($transaction_unique_branch->branch_id, $incomeExpenseHead->id, $incomeExpenseHead->type, $start_from, $start_to);
                 $end_balance += $endBalance = $this->GetBalanceByBranchIdIncExpIdTypeId($transaction_unique_branch->branch_id, $incomeExpenseHead->id, $incomeExpenseHead->type, $end_from, $end_to);
 
                 if (array_key_exists($incomeExpenseHead->name, $headBalanceStart)) {
                     $headBalanceStart[$incomeExpenseHead->name] += $startBalance;
-
                 } else {
                     $headBalanceStart[$incomeExpenseHead->name] = $startBalance;
                 }
@@ -348,27 +338,23 @@ class Transaction extends Model
                     $headBalanceEnd[$incomeExpenseHead->name] = $endBalance;
                 }
             }
-
         }
 
-        $balance = array(
-            'balance' => array(
+        $balance = [
+            'balance' => [
                 'start_balance' => $start_balance,
-                'end_balance' => $end_balance
-            ),
-            'headDetails' => array(
+                'end_balance' => $end_balance,
+            ],
+            'headDetails' => [
                 'StartDate' => $headBalanceStart,
                 'EndDate' => $headBalanceEnd,
-                'TotalBalance' => array(
+                'TotalBalance' => [
                     'start_balance' => $start_balance,
-                    'end_balance' => $end_balance
-                ),
-            )
-        );
+                    'end_balance' => $end_balance,
+                ],
+            ],
+        ];
+
         return $balance;
     }
-
-
-
-
 }

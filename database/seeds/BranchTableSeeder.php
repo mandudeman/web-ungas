@@ -12,27 +12,24 @@ class BranchTableSeeder extends Seeder
     public function run()
     {
         App\Branch::create([
-           'name'=>'Head Office',
-           'location'=>'Uttara House Buildings, Dhaka Bangladesh',
-           'description'=>''
+            'name'=>'Head Office',
+            'location'=>'Uttara House Buildings, Dhaka Bangladesh',
+            'description'=>'',
         ]);
         App\Branch::create([
-           'name'=>'Rajshahi Branch',
-           'location'=>'Padma Graden',
-           'description'=>''
+            'name'=>'Rajshahi Branch',
+            'location'=>'Padma Graden',
+            'description'=>'',
         ]);
         App\Branch::create([
-           'name'=>'Sirajgonj Branch',
-           'location'=>'S.S Road',
-           'description'=>''
+            'name'=>'Sirajgonj Branch',
+            'location'=>'S.S Road',
+            'description'=>'',
         ]);
         App\Branch::create([
-           'name'=>'Bogra Branch',
-           'location'=>'Jolershari Tala',
-           'description'=>''
+            'name'=>'Bogra Branch',
+            'location'=>'Jolershari Tala',
+            'description'=>'',
         ]);
-
-
-
     }
 }

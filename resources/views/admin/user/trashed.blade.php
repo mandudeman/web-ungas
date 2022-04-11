@@ -13,7 +13,7 @@ $breadcrumbCurrentName = " Trashed";
 $breadcrumbMainIcon = "fas fa-user";
 $breadcrumbCurrentIcon = "archive";
 
-$ModelName = 'App\User';
+$ModelName = \App\User::class;
 $ParentRouteName = 'user';
 
 

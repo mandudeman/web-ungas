@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException){
+        if ($exception instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
             return redirect('/');
         }
 

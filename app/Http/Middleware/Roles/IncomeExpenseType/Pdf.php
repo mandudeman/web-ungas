@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware\Roles\IncomeExpenseType;
 
-use Closure;
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
+
 class Pdf
 {
     /**
@@ -16,10 +17,11 @@ class Pdf
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.LedgerType.Pdf')){ //Permanently Delete
+        if (config('role_manage.LedgerType.Pdf')) { //Permanently Delete
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

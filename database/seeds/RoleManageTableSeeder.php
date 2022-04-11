@@ -39,6 +39,5 @@ class RoleManageTableSeeder extends Seeder
             'content'=>'[["User ","off","off","off","off","off","off","off","off","off"],["Role Manager","off","off","off","off","off","off","off","off","off"],["Settings","on","on","on","on","on","on","on","on","off"]]',
             'create_by'=>'admin@gmail.com',
         ]);*/
-
     }
 }

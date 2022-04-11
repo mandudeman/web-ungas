@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware\Roles\UserManage;
 
-use Closure;
-
 use App\Http\Controllers\RoleManageController;
+use Closure;
 use Illuminate\Support\Facades\Session;
 
 class Edit
@@ -18,12 +17,12 @@ class Edit
      */
     public function handle($request, Closure $next)
     {
-
-        $UserEdit=config('role_manage.User.Edit');
-        if ($UserEdit){ // Edit
+        $UserEdit = config('role_manage.User.Edit');
+        if ($UserEdit) { // Edit
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->back();
         }
     }

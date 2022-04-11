@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-
 use App\Setting;
+use Closure;
 
 class Settings
 {
@@ -17,15 +16,11 @@ class Settings
      */
     public function handle($request, Closure $next)
     {
+        $general_setting = Setting::where('settings_name', 'General Settings')->get()->first();
+        $system_setting = Setting::where('settings_name', 'System Settings')->get()->first();
 
-        $general_setting=Setting::where('settings_name','General Settings')->get()->first();
-        $system_setting=Setting::where('settings_name','System Settings')->get()->first();
-
-        $general=json_decode($general_setting->content,true);
-        $system=json_decode($system_setting->content,true);
-
-
-
+        $general = json_decode($general_setting->content, true);
+        $system = json_decode($system_setting->content, true);
 
 //        Time Zone
         date_default_timezone_set($system['timezone']);
@@ -42,7 +37,6 @@ class Settings
             'settings.zip_code' => $general['zip_code'],
             'settings.company_logo' => $general['company_logo'],
 
-
             'settings.date_format' => $system['date_format'],
             'settings.currency_code' => $system['currency_code'],
             'settings.currency_symbol' => $system['currency_symbol'],
@@ -51,7 +45,6 @@ class Settings
             'settings.fixed_asset_schedule_starting_date' => $system['fixed_asset_schedule_starting_date'],
 
         ]);
-
 
         return $next($request);
     }

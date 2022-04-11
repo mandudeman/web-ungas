@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Profile;
 use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -19,7 +19,6 @@ class ProfileController extends Controller
      */
     public function index()
     {
-
         $id = Auth::id();
         $profile = User::find($id)->profile;
 
@@ -44,7 +43,6 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-
     }
 
     /**
@@ -78,9 +76,8 @@ class ProfileController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
-            'avatar' => 'image'
+            'avatar' => 'image',
         ]);
 
         $user = Auth::user();
@@ -95,23 +92,21 @@ class ProfileController extends Controller
         $user->profile->description = $request['description'];
         $user->profile->present_address = $request['present_address'];
 
-
         if ($request->hasFile('avatar')) {
-
-            if (!empty($user->profile->avatar)  and $user->profile->avatar !='upload/avatar/avatar.png' ) {
+            if (! empty($user->profile->avatar) and $user->profile->avatar != 'upload/avatar/avatar.png') {
                 unlink($user->profile->avatar); // Delete previous image file
             }
 
             $company_logo = $request->avatar;
-            $temporaryName = time() . $company_logo->getClientOriginalName();
-            $company_logo->move("upload/avatar", $temporaryName);
-            $user->profile->avatar = 'upload/avatar/' . $temporaryName;
+            $temporaryName = time().$company_logo->getClientOriginalName();
+            $company_logo->move('upload/avatar', $temporaryName);
+            $user->profile->avatar = 'upload/avatar/'.$temporaryName;
         }
 
         $user->profile->save();
         Session::flash('success', 'Successfully Updated');
-        return redirect()->route('profile');
 
+        return redirect()->route('profile');
     }
 
     /**
@@ -127,31 +122,29 @@ class ProfileController extends Controller
 
     public function changePassword(Request $request)
     {
-
         $request->validate([
             'OldPassword' => 'required',
             'NewPassword' => 'required|min:6',
             'NewPasswordConfirm' => 'required|min:6',
         ]);
 
-        if ($request["NewPassword"] !== $request["NewPasswordConfirm"]) {
+        if ($request['NewPassword'] !== $request['NewPasswordConfirm']) {
             Session::flash('error', 'Password and Confirm password does not match');
+
             return redirect()->back();
         }
 
-        if (Hash::check($request["OldPassword"], Auth::user()->password)) {
-
+        if (Hash::check($request['OldPassword'], Auth::user()->password)) {
             $user = User::find(Auth::user()->id);
-            $user->password = Hash::make($request["NewPassword"]);
+            $user->password = Hash::make($request['NewPassword']);
             $user->save();
             Session::flash('success', 'Password Successfully Update');
+
             return redirect()->back();
-
         } else {
-
             Session::flash('error', 'Old Password Incorrect?');
+
             return redirect()->back();
         }
-
     }
 }

@@ -45,7 +45,8 @@ class Kernel extends HttpKernel
 
         'api' => [
             'throttle:60,1',
-            'bindings',
+            //'bindings',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
@@ -63,6 +64,7 @@ class Kernel extends HttpKernel
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
@@ -89,7 +91,6 @@ class Kernel extends HttpKernel
 
         'settings.all' => \App\Http\Middleware\Roles\Settings\All::class,
         'settings.show' => \App\Http\Middleware\Roles\Settings\Show::class,
-
 
         'branch.module_show' => \App\Http\Middleware\Roles\Branch\ModuleShow::class,
         'branch.show' => \App\Http\Middleware\Roles\Branch\Show::class,
@@ -120,9 +121,6 @@ class Kernel extends HttpKernel
         'income_expense_group.restore' => \App\Http\Middleware\Roles\IncomeExpenseGroup\Restore::class,
         'income_expense_group.trash_show' => \App\Http\Middleware\Roles\IncomeExpenseGroup\TrashShow::class,
         'income_expense_group.permanently_delete' => \App\Http\Middleware\Roles\IncomeExpenseGroup\PermanentlyDelete::class,
-
-
-
 
         'income_expense_head.all' => \App\Http\Middleware\Roles\IncomeExpenseHead\All::class,
         'income_expense_head.show' => \App\Http\Middleware\Roles\IncomeExpenseHead\Show::class,
@@ -224,9 +222,6 @@ class Kernel extends HttpKernel
 
         'report.Notes.all' => \App\Http\Middleware\Roles\Report\Notes\All::class,
 
-
-
-
         'report.general_report.branch.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Branch\All::class,
 
         'report.general_report.ledger.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Ledger\All::class,
@@ -235,9 +230,22 @@ class Kernel extends HttpKernel
 
         'report.general_report.Voucher.all' => \App\Http\Middleware\Roles\Report\GeneralReport\Voucher\All::class,
 
+    ];
 
-
-
-
+    /**
+     * The priority-sorted list of middleware.
+     *
+     * This forces non-global middleware to always be in the given order.
+     *
+     * @var array
+     */
+    protected $middlewarePriority = [
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\Authenticate::class,
+        \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        \Illuminate\Session\Middleware\AuthenticateSession::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \Illuminate\Auth\Middleware\Authorize::class,
     ];
 }

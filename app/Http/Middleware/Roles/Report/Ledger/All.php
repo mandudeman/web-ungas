@@ -16,10 +16,11 @@ class All
      */
     public function handle($request, Closure $next)
     {
-        if (config('role_manage.Ledger.All')){
+        if (config('role_manage.Ledger.All')) {
             return $next($request);
-        }else{
+        } else {
             Session::flash('error', 'You Can Not Perform This Action.Please Contact Your It Officer');
+
             return redirect()->route('dashboard');
         }
     }
