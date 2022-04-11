@@ -11,7 +11,6 @@ class RoleManage extends Model
     use Notifiable;
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'name',
