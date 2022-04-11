@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notifiable;
 class IncomeExpenseGroup extends Model
 {
     use HasFactory;
-
     use Notifiable;
     use SoftDeletes;
 
@@ -24,7 +23,6 @@ class IncomeExpenseGroup extends Model
         'deleted_by',
 
     ];
-
 
     public function IncomeExpenseHeads()
     {

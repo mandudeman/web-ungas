@@ -10,10 +10,8 @@ use Illuminate\Notifications\Notifiable;
 class Branch extends Model
 {
     use HasFactory;
-
     use Notifiable;
     use SoftDeletes;
-
 
     protected $fillable = [
         'name',
