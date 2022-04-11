@@ -8,23 +8,27 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^7.3|^8.0.2",
         "barryvdh/laravel-dompdf": "^1.0",
-        "doctrine/inflector": "^2.0",
-        "doctrine/instantiator": "^1.4",
-        "doctrine/lexer": "^1.2",
-        "fideloper/proxy": "^4.4",
-        "laravel/framework": "^6.20.44",
-        "laravel/tinker": "^2.5",
-        "maatwebsite/excel": "^3.1",
+        "doctrine/inflector": "^2.0.4",
+        "doctrine/instantiator": "^1.4.1",
+        "doctrine/lexer": "^1.2.3",
+        "fideloper/proxy": "4.3",
+        "fruitcake/laravel-cors": "^3.0.0",
+        "guzzlehttp/guzzle": "^7.4.2",
+        "laravel/framework": "^8.83.7",
+        "laravel/tinker": "^2.7.2",
+        "laravel/ui": "^3.4",
+        "maatwebsite/excel": "^3.1.38",
         "nesbot/carbon": "^2.57",
-        "symfony/mailer": "5.4.7",
-        "symfony/translation": "4.3.8"
+        "symfony/console": "5.4",
+        "symfony/mailer": "^6.0.7",
+        "symfony/translation": "^6.0.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.5.8|^9.3.3",
+        "nunomaduro/collision": "^5.6",
+        "phpunit/phpunit": "^9.3.3",
         "fakerphp/faker": "^1.9.1",
         "facade/ignition": "^1.16.4"
     },
@@ -57,6 +61,9 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ]
     },
     "config": {

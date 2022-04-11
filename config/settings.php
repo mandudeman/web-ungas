@@ -16,8 +16,8 @@ return [
     */
 
     'developed_label' => 'Powered By',
-    'developed_by' => 'E-Account',
-    'developed_link' => 'http://www.eaccount.xyz',
+    'developed_by' => 'Weresolve Technologies, Inc.',
+    'developed_link' => 'http://www.weresolvetech.com',
     'version' => '1.0.0',
 
     /*
@@ -25,15 +25,15 @@ return [
     |  General Settings Manage
     |--------------------------------------------------------------------------
     */
-    'company_name' => 'E-Accounts',
+    'company_name' => 'Weresolve Technologies, Inc.',
     'contract_person' => '+8801737578683',
-    'email' => 'mahmud120520@gmail.com',
-    'phone' => '+8801521497833',
-    'address_1' => 'Gulsan Link Road.',
-    'address_2' => '',
-    'city' => 'Dhaka',
-    'state' => '',
-    'zip_code' => '1229',
+    'email' => 'weresolvetech@gmail.com',
+    'phone' => '+639206091997',
+    'address_1' => 'MidTown',
+    'address_2' => 'Brgy. San Roque',
+    'city' => 'Marikina City',
+    'state' => 'NCR',
+    'zip_code' => '1801',
     'company_logo' => 'upload/company-logo/e.png',
 
     /*
@@ -43,11 +43,11 @@ return [
     */
 
     'date_format' => 'M d, Y',
-    'timezone' => 'Asia/Dhaka',
-    'currency_code' => 'BDT',
-    'currency_symbol' => '&#2547;',
+    'timezone' => 'Asia/Manila',
+    'currency_code' => 'PHP',
+    'currency_symbol' => '&#8369;',
     'is_code' => 'code',
-    'currency_position' => 'Suffix',
+    'currency_position' => 'Prefix',
     'fixed_asset_schedule_starting_date' => '2000-01-01',
 
 ];

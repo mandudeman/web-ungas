@@ -65,7 +65,7 @@ return [
     |'timezone' => 'UTC',
     */
 
-    'timezone' => 'Asia/Dhaka',
+    'timezone' => 'Asia/Manila',
 
     /*
     |--------------------------------------------------------------------------
@@ -216,7 +216,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        'PDF'=>Barryvdh\DomPDF\Facade::class,
+        'PDF'=>Barryvdh\DomPDF\Facade\Pdf::class,
 
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
