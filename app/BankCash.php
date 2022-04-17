@@ -12,7 +12,6 @@ class BankCash extends Model
     use Notifiable;
     use SoftDeletes;
 
-
     protected $fillable = [
         'name',
         'account_number',
