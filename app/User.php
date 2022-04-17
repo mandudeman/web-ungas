@@ -36,8 +36,6 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    protected $dates = ['deleted_at'];
-
     public function profile()
     {
         return $this->hasOne(\App\Profile::class);

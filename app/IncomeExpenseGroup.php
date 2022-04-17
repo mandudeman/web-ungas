@@ -22,8 +22,6 @@ class IncomeExpenseGroup extends Model
 
     ];
 
-    protected $dates = ['deleted_at'];
-
     public function IncomeExpenseHeads()
     {
         return $this->hasMany(\App\IncomeExpenseHead::class, 'income_expense_group_id');
